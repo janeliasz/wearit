@@ -1,5 +1,11 @@
 package com.example.wearit.model
 
 enum class Category {
-    Headgear
+    Headgear,
+    Coat,
+    Blouse,
+    Tshirt,
+    Trousers,
+    Shorts,
+    Boots
 }

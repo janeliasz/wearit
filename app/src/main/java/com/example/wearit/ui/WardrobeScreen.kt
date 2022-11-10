@@ -1,8 +1,11 @@
 package com.example.wearit.ui
 
 import android.util.Log
+import android.view.ViewDebug.IntToString
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -20,49 +23,32 @@ import androidx.compose.ui.unit.sp
 import com.example.wearit.R
 import com.example.wearit.model.Category
 import com.example.wearit.ui.theme.Purple500
+import java.util.*
 
 
 @Composable
 fun WardrobeScreen(
     currentCategory: Category,
-    goToHeadGears: () -> Unit,
-    goToCoats: () -> Unit,
-    goToBlouses: () -> Unit,
-    goToTshirts: () -> Unit,
-    goToTrousers: () -> Unit,
-    goToShorts: () -> Unit,
-    goToBoots: () -> Unit,
     goToPickerScreen: () -> Unit,
+    onCategoryChange: (category:Category) -> Unit,
 
 ) {
     val fonts = FontFamily(
         Font(R.font.reemkufi_bold, FontWeight.Bold)
     )
+    val listOfCategories = (Category.values())
+
 
     Column {
         Text(text = "Current category is " + currentCategory.name)
-        Button(onClick = goToHeadGears) {
-            Text(text = "Go to HeadGears")
-        }
-        Button(onClick = goToCoats) {
-            Text(text = "Go to Coats")
-        }
-        Button(onClick = goToBlouses) {
-            Text(text = "Go to Blouses")
-        }
-        Button(onClick = goToTshirts) {
-            Text(text = "Go to T-Shirts")
-        }
-        Button(onClick = goToTrousers) {
-            Text(text = "Go to Trousers")
-        }
-        Button(onClick = goToShorts) {
-            Text(text = "Go to Shorts")
-        }
-        Button(onClick = goToBoots) {
-            Text(text = "Go to Boots")
-        }
 
+        LazyColumn {
+            items(listOfCategories) { category ->
+                Button(onClick = { onCategoryChange(category) }) {
+                    Text(text = "Go to $category")
+                }
+            }
+        }
     }
     //draw button
     Column(modifier = Modifier.fillMaxSize(),

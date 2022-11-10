@@ -1,8 +1,5 @@
 package com.example.wearit
 
-import android.util.Log
-import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,13 +37,7 @@ fun WearItApp() {
         composable(WearItScreen.Wardrobe.name) {
             WardrobeScreen(
                 currentCategory = uiState.currentCategory,
-                goToHeadGears = {viewModel.goToCategory(Category.Headgear)},
-                goToCoats = {viewModel.goToCategory(Category.Coat)},
-                goToBlouses = {viewModel.goToCategory(Category.Blouse)},
-                goToTshirts = {viewModel.goToCategory(Category.Tshirt)},
-                goToTrousers = {viewModel.goToCategory(Category.Trousers)},
-                goToShorts = {viewModel.goToCategory(Category.Shorts)},
-                goToBoots = {viewModel.goToCategory(Category.Boots)},
+                onCategoryChange = { viewModel.goToCategory(it) },
                 //picker screen:
                 goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) }
 

@@ -33,9 +33,6 @@ fun WardrobeScreen(
     onCategoryChange: (category:Category) -> Unit,
 
 ) {
-    val fonts = FontFamily(
-        Font(R.font.reemkufi_bold, FontWeight.Bold)
-    )
     val listOfCategories = (Category.values())
 
 

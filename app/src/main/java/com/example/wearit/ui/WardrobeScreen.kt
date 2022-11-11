@@ -50,25 +50,4 @@ fun WardrobeScreen(
             }
         }
     }
-    //draw button
-    Column(modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
-    ){
-        ExtendedFloatingActionButton(
-            modifier = Modifier
-                .padding(all = 40.dp)
-                .fillMaxWidth(),
-            onClick = goToPickerScreen,
-            backgroundColor = Color.Red,
-            contentColor = Color.White,
-            text = { Text("DRAW",
-                modifier = Modifier.padding(all = 8.dp),
-                fontFamily = fonts,
-                fontSize = 30.sp,
-
-//                style = MaterialTheme.typography.button,
-            )}
-        )
-    }
 }

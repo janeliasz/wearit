@@ -13,18 +13,18 @@ val fakeItems = listOf<Item>(
                 id = "2",
                 name = "sweater",
                 photoId = R.drawable.sweater,
-                category = Category.Headgear
+                category = Category.Blouse
         ),
         Item(
                 id = "3",
                 name = "jeans",
                 photoId = R.drawable.jeans,
-                category = Category.Headgear
+                category = Category.Trousers
         ),
         Item(
                 id = "4",
                 name = "shoes",
                 photoId = R.drawable.shoes,
-                category = Category.Headgear
+                category = Category.Boots
         )
 )

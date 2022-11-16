@@ -32,7 +32,8 @@ fun WearItApp() {
         composable(WearItScreen.Picker.name) {
             PickerScreen(
                 onButtonClick = { navController.navigate(WearItScreen.Wardrobe.name) },
-                currentSelection = viewModel.currentSelection
+                currentSelection = uiState.currentSelection,
+                changeSelectedItem = { category, next ->  viewModel.changeSelectedItem(category, next) }
             )
         }
 

@@ -8,7 +8,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.wearit.model.Category
 import com.example.wearit.ui.AppViewModel
 import com.example.wearit.ui.PickerScreen
 import com.example.wearit.ui.WardrobeScreen
@@ -31,7 +30,10 @@ fun WearItApp() {
         startDestination = WearItScreen.Picker.name
     ) {
         composable(WearItScreen.Picker.name) {
-            PickerScreen(onButtonClick = { navController.navigate(WearItScreen.Wardrobe.name) })
+            PickerScreen(
+                onButtonClick = { navController.navigate(WearItScreen.Wardrobe.name) },
+                currentSelection = viewModel.currentSelection
+            )
         }
 
         composable(WearItScreen.Wardrobe.name) {

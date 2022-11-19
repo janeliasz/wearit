@@ -26,7 +26,15 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.wearit.ui.AppViewModel
+import android.graphics.BitmapFactory
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.wearit.data.AppViewModel
 import com.example.wearit.ui.PickerScreen
 import com.example.wearit.ui.WardrobeScreen
 
@@ -42,7 +50,7 @@ enum class WearItScreen() {
 @Preview
 @Composable
 fun WearItApp() {
-    val viewModel: AppViewModel = viewModel()
+    val viewModel = AppViewModel(LocalContext.current)
     val uiState by viewModel.uiState.collectAsState()
 
     val navController = rememberNavController()

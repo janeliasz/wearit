@@ -50,6 +50,8 @@ enum class WearItScreen() {
 @Preview
 @Composable
 fun WearItApp() {
+    val context = LocalContext.current
+
     val viewModel = AppViewModel(LocalContext.current)
     val uiState by viewModel.uiState.collectAsState()
 
@@ -75,8 +77,8 @@ fun WearItApp() {
                 currentCategory = uiState.currentCategory,
                 onCategoryChange = { viewModel.goToCategory(it) },
                 //picker screen:
-                goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) }
-
+                goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
+                addItem = { bitmap -> viewModel.addItem(context, "test", bitmap)}
             )
         }
     }

@@ -29,6 +29,39 @@ class AppViewModel(context: Context) : ViewModel() {
     ))
     val uiState = _uiState.asStateFlow()
 
+    fun goToCategory(category: Category) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                currentCategory = category
+            )
+        }
+    }
+
+    fun changeSelectedItem(category: Category, next: Boolean) {
+        val newCurrentSelection = _uiState.value.currentSelection.map { item ->
+            if (item.category != category)
+                item
+            else {
+                val allItemsInCurrentItemCategory = fakeItemsData.getValue(category)
+                val currentItemIndex = allItemsInCurrentItemCategory.indexOf(item)
+                var newCurrentItemIndex = currentItemIndex + if (next) 1 else -1
+
+                if (newCurrentItemIndex == allItemsInCurrentItemCategory.size)
+                    newCurrentItemIndex = 0
+                else if (newCurrentItemIndex < 0)
+                    newCurrentItemIndex = allItemsInCurrentItemCategory.size - 1
+
+                allItemsInCurrentItemCategory[newCurrentItemIndex]
+            }
+        }
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                currentSelection = newCurrentSelection
+            )
+        }
+    }
+
     fun addItem(context: Context, name: String, bitmap: Bitmap): Boolean {
         val photoFilename = internalStorageHelper.savePhoto(context, bitmap)
         if (photoFilename == "") return false;
@@ -61,38 +94,5 @@ class AppViewModel(context: Context) : ViewModel() {
         }
 
         return saved
-    }
-
-    fun goToCategory(category: Category){
-        _uiState.update { currentState ->
-            currentState.copy(
-                currentCategory = category
-            )
-        }
-    }
-
-    fun changeSelectedItem(category: Category, next: Boolean) {
-        val newCurrentSelection = _uiState.value.currentSelection.map { item ->
-            if (item.category != category)
-                item
-            else {
-                val allItemsInCurrentItemCategory = fakeItemsData.getValue(category)
-                val currentItemIndex = allItemsInCurrentItemCategory.indexOf(item)
-                var newCurrentItemIndex = currentItemIndex + if (next) 1 else -1
-
-                if (newCurrentItemIndex == allItemsInCurrentItemCategory.size)
-                    newCurrentItemIndex = 0
-                else if (newCurrentItemIndex < 0)
-                    newCurrentItemIndex = allItemsInCurrentItemCategory.size - 1
-
-                allItemsInCurrentItemCategory[newCurrentItemIndex]
-            }
-        }
-
-        _uiState.update { currentState ->
-            currentState.copy(
-                currentSelection = newCurrentSelection
-            )
-        }
     }
 }

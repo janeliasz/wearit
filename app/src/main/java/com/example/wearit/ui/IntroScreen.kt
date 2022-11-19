@@ -23,11 +23,11 @@ import com.example.wearit.model.Category
 import kotlinx.coroutines.delay
 
 @Composable
-fun IntroScreen(navController: NavController){
+fun IntroScreen(navigateToPicker: () -> Unit){
     val scale = 1f
     LaunchedEffect(key1 = true ){
         delay(800L)
-        navController.navigate(WearItScreen.Picker.name)
+        navigateToPicker()
     }
     Box(
         contentAlignment = Alignment.Center,

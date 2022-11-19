@@ -20,7 +20,8 @@ import com.example.wearit.model.Category
 fun WardrobeScreen(
     currentCategory: Category,
     onCategoryChange: (category:Category) -> Unit,
-    addItem: (bitmap: Bitmap) -> Boolean
+    addItem: (bitmap: Bitmap) -> Boolean,
+    navigateToPicker: () -> Unit
 ) {
     val listOfCategories = (Category.values())
 
@@ -38,6 +39,10 @@ fun WardrobeScreen(
     Column {
         Button(onClick = { imagePicker.launch("image/*") }) {
             Text(text = "Add")
+        }
+        
+        Button(onClick = navigateToPicker) {
+            Text(text = "Go to Picker")
         }
         
         Text(text = "Current category is " + currentCategory.name)

@@ -39,7 +39,8 @@ fun WearItApp() {
         composable(WearItScreen.Picker.name) {
             PickerScreen(
                 onButtonClick = { navController.navigate(WearItScreen.Wardrobe.name) },
-                currentSelection = uiState.currentSelection,
+                getItemPhotoByPhotoFilename = { itemId ->  viewModel.getItemPhotoByPhotoFilename(itemId)!! },
+                currentSelection = uiState.currentSelection.map { itemId -> viewModel.getItemById(itemId)!! },
                 changeSelectedItem = { category, next ->  viewModel.changeSelectedItem(category, next) }
             )
         }
@@ -48,7 +49,8 @@ fun WearItApp() {
             WardrobeScreen(
                 currentCategory = uiState.currentCategory,
                 onCategoryChange = { viewModel.goToCategory(it) },
-                addItem = { bitmap -> viewModel.addItem(context, "test", bitmap)}
+                addItem = { bitmap -> viewModel.addItem(context, "test", bitmap)},
+                navigateToPicker = { navController.navigate(WearItScreen.Picker.name) }
             )
         }
     }

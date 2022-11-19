@@ -6,28 +6,50 @@ import androidx.lifecycle.ViewModel
 import com.example.wearit.model.AppUiState
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
-import com.example.wearit.model.fakeItemsData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.UUID
+import kotlin.random.Random
 
-val initialCurrentSelection: MutableList<Item> = mutableListOf(
-    fakeItemsData.getValue(Category.Headgear)[0],
-    fakeItemsData.getValue(Category.Blouse)[0],
-    fakeItemsData.getValue(Category.Tshirt)[0],
-    fakeItemsData.getValue(Category.Trousers)[0],
-    fakeItemsData.getValue(Category.Boots)[0]
-)
+fun getInitialCurrentSelection(items: Map<Category, List<Item>>): List<String> {
+    val selection = mutableListOf<String>()
+
+    items.forEach { entry ->
+        val activeItems = entry.value.filter { item -> item.isActive }
+        if (activeItems.isNotEmpty()) {
+            selection.add(activeItems[Random.nextInt(activeItems.size)].id)
+        }
+    }
+
+    return selection
+}
 
 class AppViewModel(context: Context) : ViewModel() {
     private val internalStorageHelper = InternalStorageHelper()
+    private val loadedItemsMap = internalStorageHelper.getItemsMap(context)
+    private val loadedPhotos = internalStorageHelper.loadPhotos(context)
 
     private val _uiState = MutableStateFlow(AppUiState(
-        items = internalStorageHelper.getItemsMap(context),
-        currentSelection = initialCurrentSelection
+        items = loadedItemsMap,
+        currentSelection = getInitialCurrentSelection(loadedItemsMap)
     ))
     val uiState = _uiState.asStateFlow()
+
+    fun getItemById(id: String): Item? {
+        _uiState.value.items.forEach { entry ->
+            entry.value.forEach { item ->
+                if (item.id == id) return item
+            }
+        }
+        return null
+    }
+
+    fun getItemPhotoByPhotoFilename(id: String): Bitmap? {
+        return loadedPhotos.entries.first { entry ->
+            entry.key.startsWith(id)
+        }.value
+    }
 
     fun goToCategory(category: Category) {
         _uiState.update { currentState ->
@@ -38,11 +60,13 @@ class AppViewModel(context: Context) : ViewModel() {
     }
 
     fun changeSelectedItem(category: Category, next: Boolean) {
-        val newCurrentSelection = _uiState.value.currentSelection.map { item ->
+        val newCurrentSelection = _uiState.value.currentSelection.map { itemId ->
+            val item = getItemById(itemId)!!
+
             if (item.category != category)
-                item
+                itemId
             else {
-                val allItemsInCurrentItemCategory = fakeItemsData.getValue(category)
+                val allItemsInCurrentItemCategory = _uiState.value.items.getValue(category)
                 val currentItemIndex = allItemsInCurrentItemCategory.indexOf(item)
                 var newCurrentItemIndex = currentItemIndex + if (next) 1 else -1
 
@@ -51,7 +75,7 @@ class AppViewModel(context: Context) : ViewModel() {
                 else if (newCurrentItemIndex < 0)
                     newCurrentItemIndex = allItemsInCurrentItemCategory.size - 1
 
-                allItemsInCurrentItemCategory[newCurrentItemIndex]
+                allItemsInCurrentItemCategory[newCurrentItemIndex].id
             }
         }
 

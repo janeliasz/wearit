@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -33,7 +34,8 @@ fun WardrobeScreen(
     goToPickerScreen: () -> Unit,
     onCategoryChange: (category: Category) -> Unit,
     itemsOfCurrentCategory: List<Item>,
-    addItem: (bitmap: Bitmap) -> Boolean
+    addItem: (bitmap: Bitmap) -> Boolean,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
 ) {
 
     val listOfCategories = Category.values().asList()
@@ -46,7 +48,8 @@ fun WardrobeScreen(
                 onCategoryChange = onCategoryChange,
                 listOfCategories = listOfCategories,
                 itemsOfCurrentCategory = itemsOfCurrentCategory,
-                addItem = addItem
+                addItem = addItem,
+                getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
             )
         },
         bottomBar = {
@@ -64,7 +67,8 @@ fun WardrobePageContent(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
     itemsOfCurrentCategory: List<Item>,
-    addItem: (bitmap: Bitmap) -> Boolean
+    addItem: (bitmap: Bitmap) -> Boolean,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
 ) {
     Box(modifier = Modifier.padding(innerPadding)) {
         Column() {
@@ -74,7 +78,8 @@ fun WardrobePageContent(
             WardrobeClothesListSection(
                 onCategoryChange = onCategoryChange,
                 listOfCategories = listOfCategories,
-                itemsOfCurrentCategory = itemsOfCurrentCategory
+                itemsOfCurrentCategory = itemsOfCurrentCategory,
+                getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
             )
         }
     }
@@ -84,7 +89,8 @@ fun WardrobePageContent(
 fun WardrobeClothesListSection(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
-    itemsOfCurrentCategory: List<Item>
+    itemsOfCurrentCategory: List<Item>,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
 
 ) {
     Row(
@@ -96,7 +102,8 @@ fun WardrobeClothesListSection(
             listOfCategories = listOfCategories,
         )
         WardrobeListOfItemsFromCurrentCategory(
-            itemsOfCurrentCategory = itemsOfCurrentCategory
+            itemsOfCurrentCategory = itemsOfCurrentCategory,
+            getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
         )
     }
 }
@@ -122,7 +129,8 @@ fun WardrobeListOfCategories(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WardrobeListOfItemsFromCurrentCategory(
-    itemsOfCurrentCategory: List<Item>
+    itemsOfCurrentCategory: List<Item>,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
 ) {
     Box(
         Modifier
@@ -135,7 +143,10 @@ fun WardrobeListOfItemsFromCurrentCategory(
         )
         {
             items(itemsOfCurrentCategory) { item ->
-                SingleClothItem(item)
+                SingleClothItem(
+                    item = item,
+                    getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
+                )
             }
         }
     }
@@ -143,7 +154,8 @@ fun WardrobeListOfItemsFromCurrentCategory(
 
 @Composable
 fun SingleClothItem(
-    item: Item
+    item: Item,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
 ) {
     Column(
         Modifier
@@ -152,7 +164,7 @@ fun SingleClothItem(
 
     ) {
         Image(
-            painter = painterResource(id = item.photoId),
+            bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
             contentDescription = item.name,
             modifier = Modifier
                 .size(100.dp)

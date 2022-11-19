@@ -1,5 +1,6 @@
 package com.example.wearit.ui
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +11,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
@@ -18,6 +19,7 @@ import com.example.wearit.model.Item
 @Composable
 fun PickerScreen(
     onButtonClick: () -> Unit,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     currentSelection: List<Item>,
     changeSelectedItem: (category: Category, next: Boolean) -> Unit
 ) {
@@ -35,7 +37,7 @@ fun PickerScreen(
                     }
 
                     Image(
-                        painter = painterResource(id = item.photoId),
+                        bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
                         contentDescription = item.name,
                         modifier = Modifier.size(100.dp)
                     )

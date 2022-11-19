@@ -8,7 +8,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.wearit.model.fakeItemsData
 import android.graphics.BitmapFactory
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -47,7 +46,8 @@ fun WearItApp() {
         composable(WearItScreen.Picker.name) {
             PickerScreen(
                 onButtonClick = { navController.navigate(WearItScreen.Wardrobe.name) },
-                currentSelection = uiState.currentSelection,
+                getItemPhotoByPhotoFilename = { itemId ->  viewModel.getItemPhotoByPhotoFilename(itemId)!! },
+                currentSelection = uiState.currentSelection.map { itemId -> viewModel.getItemById(itemId)!! },
                 changeSelectedItem = { category, next ->  viewModel.changeSelectedItem(category, next) }
             )
         }
@@ -55,12 +55,11 @@ fun WearItApp() {
         composable(WearItScreen.Wardrobe.name) {
             WardrobeScreen(
                 onCategoryChange = { viewModel.goToCategory(it) },
-
-                //picker screen:
                 goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
-                itemsOfCurrentCategory = fakeItemsData[uiState.currentCategory]!!,
-
-                addItem = { bitmap -> viewModel.addItem(context, "test", bitmap)}
+//                itemsOfCurrentCategory = fakeItemsData[uiState.currentCategory]!!,
+                itemsOfCurrentCategory = uiState.items[uiState.currentCategory]!!,
+                addItem = { bitmap -> viewModel.addItem(context, "test", bitmap)},
+            getItemPhotoByPhotoFilename = { itemId ->  viewModel.getItemPhotoByPhotoFilename(itemId)!! },
             )
         }
     }

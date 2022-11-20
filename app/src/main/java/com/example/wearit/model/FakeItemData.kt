@@ -31,6 +31,13 @@ val fakeItemsData: Map<Category, List<Item>> = mapOf(
             photoId = R.drawable.hat4,
             category = Category.Headgear,
             isActive = true
+        ),
+        Item(
+            id = "5",
+            name = "hat5",
+            photoId = R.drawable.hat,
+            category = Category.Headgear,
+            isActive = true
         )
     ),
     Category.Blouse to listOf(

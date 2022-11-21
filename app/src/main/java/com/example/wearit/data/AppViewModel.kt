@@ -26,9 +26,9 @@ fun getInitialCurrentSelection(items: Map<Category, List<Item>>): List<String> {
 }
 
 class AppViewModel(context: Context) : ViewModel() {
-    private val internalStorageHelper = InternalStorageHelper()
-    private val loadedItemsMap = internalStorageHelper.getItemsMap(context)
-    private val loadedPhotos = internalStorageHelper.loadPhotos(context)
+    private val internalStorageHelper = InternalStorageHelper(context)
+    private val loadedItemsMap = internalStorageHelper.getItemsMap()
+    private val loadedPhotosMap = internalStorageHelper.loadPhotos()
 
     private val _uiState = MutableStateFlow(AppUiState(
         items = loadedItemsMap,
@@ -46,9 +46,14 @@ class AppViewModel(context: Context) : ViewModel() {
     }
 
     fun getItemPhotoByPhotoFilename(id: String): Bitmap? {
-        return loadedPhotos.entries.first { entry ->
-            entry.key.startsWith(id)
-        }.value
+        return try {
+            loadedPhotosMap.entries.first { entry ->
+                entry.key.startsWith(id)
+            }.value
+        } catch (e: NoSuchElementException) {
+            e.printStackTrace()
+            null
+        }
     }
 
     fun goToCategory(category: Category) {
@@ -86,9 +91,9 @@ class AppViewModel(context: Context) : ViewModel() {
         }
     }
 
-    fun addItem(context: Context, name: String, bitmap: Bitmap): Boolean {
-        val photoFilename = internalStorageHelper.savePhoto(context, bitmap)
-        if (photoFilename == "") return false;
+    fun addItem(name: String, bitmap: Bitmap): Boolean {
+        val photoFilename = internalStorageHelper.savePhoto(bitmap)
+        if (photoFilename == "") return false
 
         val newItem = Item(
             id = UUID.randomUUID().toString(),
@@ -97,7 +102,7 @@ class AppViewModel(context: Context) : ViewModel() {
             category = _uiState.value.currentCategory
         )
 
-        val saved = internalStorageHelper.saveItem(context, newItem)
+        val saved = internalStorageHelper.saveItem(newItem)
 
         if (saved) {
             val newItems = _uiState.value.items.toMutableMap()

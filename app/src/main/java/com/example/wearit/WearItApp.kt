@@ -49,7 +49,7 @@ fun WearItApp() {
             WardrobeScreen(
                 currentCategory = uiState.currentCategory,
                 onCategoryChange = { viewModel.goToCategory(it) },
-                addItem = { bitmap -> viewModel.addItem(context, "test", bitmap)},
+                addItem = { bitmap -> viewModel.addItem("test", bitmap)},
                 navigateToPicker = { navController.navigate(WearItScreen.Picker.name) }
             )
         }

@@ -11,8 +11,8 @@ import kotlinx.serialization.json.decodeFromStream
 import java.io.IOException
 import java.util.UUID
 
-class InternalStorageHelper {
-    fun savePhoto(context: Context, bitmap: Bitmap): String {
+class InternalStorageHelper(private val context: Context) {
+    fun savePhoto(bitmap: Bitmap): String {
         return try {
             val filename = UUID.randomUUID().toString() + ".jpg"
             context.openFileOutput(filename, Context.MODE_PRIVATE).use { stream ->
@@ -27,7 +27,7 @@ class InternalStorageHelper {
         }
     }
 
-    fun loadPhotos(context: Context): Map<String, Bitmap> {
+    fun loadPhotos(): Map<String, Bitmap> {
         val photosMap: MutableMap<String, Bitmap> = mutableMapOf()
 
         val files = context.filesDir.listFiles()
@@ -40,7 +40,7 @@ class InternalStorageHelper {
         return photosMap
     }
 
-    fun saveItem(context: Context, item: Item): Boolean {
+    fun saveItem(item: Item): Boolean {
         return try {
             val json = Json.encodeToString<Item>(item)
             context.openFileOutput("item-" + item.id, Context.MODE_PRIVATE).use { stream ->
@@ -53,17 +53,17 @@ class InternalStorageHelper {
         }
     }
 
-    fun loadItems(context: Context): List<Item> {
+    fun loadItems(): List<Item> {
         val files = context.filesDir.listFiles()
         return files.filter { it.canRead() && it.isFile && it.name.startsWith("item-")}.map {
             Json.decodeFromStream<Item>(it.inputStream())
         }
     }
 
-    fun getItemsMap(context: Context): Map<Category, List<Item>> {
+    fun getItemsMap(): Map<Category, List<Item>> {
         val itemsMap = mutableMapOf<Category, MutableList<Item>>()
 
-        val itemList = loadItems(context)
+        val itemList = loadItems()
 
         itemList.forEach { item ->
             if (itemsMap.containsKey(item.category)) {
@@ -77,7 +77,7 @@ class InternalStorageHelper {
         return itemsMap
     }
 
-    fun deleteFile(context: Context, filename: String): Boolean {
+    fun deleteFile(filename: String): Boolean {
         return try {
             context.deleteFile(filename)
         } catch (e: IOException) {

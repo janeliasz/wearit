@@ -1,40 +1,23 @@
 package com.example.wearit.ui
 
-import android.media.Image
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-//import androidx.compose.foundation.layout.ColumnScopeInstance.align
-//import androidx.compose.foundation.layout.ColumnScopeInstance.align
-//import androidx.compose.foundation.layout.ColumnScopeInstance.align
-//import androidx.compose.foundation.layout.ColumnScopeInstance.align
-//import androidx.compose.foundation.layout.ColumnScopeInstance.align
-//import androidx.compose.foundation.layout.ColumnScopeInstance.align
-//import androidx.compose.foundation.layout.ColumnScopeInstance.align
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Composable
 fun WardrobeScreen(
-    currentCategory: Category,
     goToPickerScreen: () -> Unit,
     onCategoryChange: (category: Category) -> Unit,
     itemsOfCurrentCategory: List<Item>?,
@@ -43,12 +26,6 @@ fun WardrobeScreen(
 
     val listOfCategories = (Category.values())
 
-    val array = ArrayList<Item>()
-    if (itemsOfCurrentCategory != null) {
-        for (item in itemsOfCurrentCategory) {
-            array.add(item)
-        }
-    }
 
     Scaffold(
         content = { innerPadding ->
@@ -57,11 +34,13 @@ fun WardrobeScreen(
                 innerPadding = innerPadding,
                 onCategoryChange = onCategoryChange,
                 listOfCategories=listOfCategories,
-                itemsOfCurrentCategory = array
+                itemsOfCurrentCategory = itemsOfCurrentCategory
                 )
         },
             bottomBar = {
-                BottomBarSpace()
+                BottomBarSpace(
+                    goToPickerScreen = goToPickerScreen
+                )
             }
     )
 }
@@ -71,7 +50,7 @@ fun WardrobePageContent(
     innerPadding: PaddingValues,
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: Array<Category>,
-    itemsOfCurrentCategory: ArrayList<Item>
+    itemsOfCurrentCategory: List<Item>?
 ){
     Box(modifier = Modifier.padding(innerPadding)) {
         Column() {
@@ -89,7 +68,7 @@ fun WardrobePageContent(
 fun WardrobeClothesListSection(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: Array<Category>,
-    itemsOfCurrentCategory: ArrayList<Item>
+    itemsOfCurrentCategory: List<Item>?
 
 ){
     Row(
@@ -129,7 +108,7 @@ fun WardrobeListOfCategories(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WardrobeListOfItemsFromCurrentCategory(
-    itemsOfCurrentCategory: ArrayList<Item>
+    itemsOfCurrentCategory: List<Item>?
 ){
     Box(
         Modifier
@@ -142,7 +121,7 @@ fun WardrobeListOfItemsFromCurrentCategory(
             cells = GridCells.Fixed(2)
         )
         {
-            items(itemsOfCurrentCategory) { item ->
+            items(itemsOfCurrentCategory!!) { item ->
                 SingleClothItem(item)
             }
         }
@@ -202,7 +181,9 @@ fun WardrobeNavigationSection(){
 
 
 @Composable
-fun BottomBarSpace(){
+fun BottomBarSpace(
+    goToPickerScreen: () -> Unit,
+    ){
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -213,7 +194,7 @@ fun BottomBarSpace(){
             ),
         contentAlignment = Alignment.Center
     ) {
-        Button(onClick = { /*TODO*/ }) {
+        Button(onClick = { goToPickerScreen() }) {
             Text(text = "DRAW")
         }
     }

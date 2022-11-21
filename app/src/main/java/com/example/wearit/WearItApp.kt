@@ -43,7 +43,6 @@ fun WearItApp() {
 
         composable(WearItScreen.Wardrobe.name) {
             WardrobeScreen(
-                currentCategory = uiState.currentCategory,
                 onCategoryChange = { viewModel.goToCategory(it) },
                 //picker screen:
                 goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },

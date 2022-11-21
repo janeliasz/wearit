@@ -24,7 +24,7 @@ fun WardrobeScreen(
 
     ) {
 
-    val listOfCategories = (Category.values())
+    val listOfCategories = Category.values().asList()
 
 
     Scaffold(
@@ -34,12 +34,13 @@ fun WardrobeScreen(
                 innerPadding = innerPadding,
                 onCategoryChange = onCategoryChange,
                 listOfCategories=listOfCategories,
-                itemsOfCurrentCategory = itemsOfCurrentCategory
+                itemsOfCurrentCategory = itemsOfCurrentCategory!!
                 )
         },
             bottomBar = {
                 BottomBarSpace(
                     goToPickerScreen = goToPickerScreen
+
                 )
             }
     )
@@ -49,8 +50,8 @@ fun WardrobeScreen(
 fun WardrobePageContent(
     innerPadding: PaddingValues,
     onCategoryChange: (category: Category) -> Unit,
-    listOfCategories: Array<Category>,
-    itemsOfCurrentCategory: List<Item>?
+    listOfCategories: List<Category>,
+    itemsOfCurrentCategory: List<Item>
 ){
     Box(modifier = Modifier.padding(innerPadding)) {
         Column() {
@@ -67,8 +68,8 @@ fun WardrobePageContent(
 @Composable
 fun WardrobeClothesListSection(
     onCategoryChange: (category: Category) -> Unit,
-    listOfCategories: Array<Category>,
-    itemsOfCurrentCategory: List<Item>?
+    listOfCategories: List<Category>,
+    itemsOfCurrentCategory: List<Item>
 
 ){
     Row(
@@ -88,7 +89,7 @@ fun WardrobeClothesListSection(
 @Composable
 fun WardrobeListOfCategories(
     onCategoryChange: (category: Category) -> Unit,
-    listOfCategories: Array<Category>,
+    listOfCategories: List<Category>,
 ){
     Column(
         modifier = Modifier
@@ -108,7 +109,7 @@ fun WardrobeListOfCategories(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WardrobeListOfItemsFromCurrentCategory(
-    itemsOfCurrentCategory: List<Item>?
+    itemsOfCurrentCategory: List<Item>
 ){
     Box(
         Modifier
@@ -121,7 +122,7 @@ fun WardrobeListOfItemsFromCurrentCategory(
             cells = GridCells.Fixed(2)
         )
         {
-            items(itemsOfCurrentCategory!!) { item ->
+            items(itemsOfCurrentCategory) { item ->
                 SingleClothItem(item)
             }
         }
@@ -183,6 +184,7 @@ fun WardrobeNavigationSection(){
 @Composable
 fun BottomBarSpace(
     goToPickerScreen: () -> Unit,
+
     ){
     Box(
         modifier = Modifier

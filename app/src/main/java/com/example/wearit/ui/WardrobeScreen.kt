@@ -20,7 +20,7 @@ import java.util.*
 fun WardrobeScreen(
     goToPickerScreen: () -> Unit,
     onCategoryChange: (category: Category) -> Unit,
-    itemsOfCurrentCategory: List<Item>?,
+    itemsOfCurrentCategory: List<Item>,
 
     ) {
 
@@ -34,7 +34,7 @@ fun WardrobeScreen(
                 innerPadding = innerPadding,
                 onCategoryChange = onCategoryChange,
                 listOfCategories=listOfCategories,
-                itemsOfCurrentCategory = itemsOfCurrentCategory!!
+                itemsOfCurrentCategory = itemsOfCurrentCategory
                 )
         },
             bottomBar = {

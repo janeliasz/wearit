@@ -82,6 +82,9 @@ val fakeItemsData: Map<Category, List<Item>> = mapOf(
             isActive = true
         ),
     ),
+    Category.Coat to listOf(
+
+    ),
     Category.Blouse to listOf(
         Item(
             id = "5",
@@ -115,6 +118,9 @@ val fakeItemsData: Map<Category, List<Item>> = mapOf(
             category = Category.Trousers,
             isActive = true
         )
+    ),
+    Category.Shorts to listOf(
+
     ),
     Category.Boots to listOf(
         Item(

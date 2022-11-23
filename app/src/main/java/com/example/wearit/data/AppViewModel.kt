@@ -91,6 +91,24 @@ class AppViewModel(context: Context) : ViewModel() {
         }
     }
 
+    fun drawItems() {
+        val newCurrentSelection = mutableListOf<String>()
+
+        _uiState.value.items.forEach { entry ->
+            val listOfActiveItems=entry.value.filter { it.isActive }
+            if( listOfActiveItems.isNotEmpty()){
+                newCurrentSelection.add(listOfActiveItems.random().id)
+            }
+        }
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                currentSelection = newCurrentSelection
+            )
+        }
+    }
+
+
     fun addItem(name: String, bitmap: Bitmap): Boolean {
         val photoFilename = internalStorageHelper.savePhoto(bitmap)
         if (photoFilename == "") return false

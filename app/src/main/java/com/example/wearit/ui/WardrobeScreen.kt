@@ -8,7 +8,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -91,10 +90,7 @@ fun WardrobeListOfCategories(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
 ){
-    Column(
-        modifier = Modifier
-            .background(Color.Green)
-    ) {
+    Column() {
 
         LazyColumn {
             items(listOfCategories) { category ->
@@ -113,7 +109,6 @@ fun WardrobeListOfItemsFromCurrentCategory(
 ){
     Box(
         Modifier
-            .background(Color.Yellow)
             .fillMaxWidth(),
         contentAlignment = Alignment.TopCenter
 
@@ -135,14 +130,7 @@ fun SingleClothItem(
 ){
     Column(
         Modifier
-            .background(Color.Green)
-            .padding(3.dp)
-            .border(
-                width = 3.dp,
-                color = Color.Red,
-                shape = RoundedCornerShape(50.dp)
-            ),
-
+            .padding(3.dp),
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
@@ -156,7 +144,6 @@ fun SingleClothItem(
         )
         Text(
             text = item.name, textAlign = TextAlign.Center, modifier = Modifier
-                .border(width = 3.dp, color = Color.Red)
                 .padding(5.dp, 0.dp, 5.dp, 10.dp)
 
         )
@@ -169,7 +156,6 @@ fun WardrobeNavigationSection(){
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
-            .background(Color.Red)
     ) {
         Button(onClick = { /*TODO*/ }) {
             Text(text = "ADD")
@@ -189,11 +175,7 @@ fun BottomBarSpace(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
-            .border(
-                width = 3.dp,
-                color = Color.Red,
-            ),
+            .height(100.dp),
         contentAlignment = Alignment.Center
     ) {
         Button(onClick = { goToPickerScreen() }) {

@@ -31,7 +31,59 @@ val fakeItemsData: Map<Category, List<Item>> = mapOf(
             photoId = R.drawable.hat4,
             category = Category.Headgear,
             isActive = true
-        )
+        ),
+        Item(
+            id = "5",
+            name = "hat5",
+            photoId = R.drawable.chef_hat,
+            category = Category.Headgear,
+            isActive = true
+        ),
+        Item(
+            id = "6",
+            name = "hat6",
+            photoId = R.drawable.comando_hat,
+            category = Category.Headgear,
+            isActive = true
+        ),
+        Item(
+            id = "7",
+            name = "hat7",
+            photoId = R.drawable.comando_hat_2,
+            category = Category.Headgear,
+            isActive = true
+        ),
+        Item(
+            id = "8",
+            name = "hat8",
+            photoId = R.drawable.green_hat,
+            category = Category.Headgear,
+            isActive = true
+        ),
+        Item(
+            id = "9",
+            name = "hat9",
+            photoId = R.drawable.kapelusz,
+            category = Category.Headgear,
+            isActive = true
+        ),
+        Item(
+            id = "10",
+            name = "hat10",
+            photoId = R.drawable.nurse_hat,
+            category = Category.Headgear,
+            isActive = true
+        ),
+        Item(
+            id = "11",
+            name = "hat11",
+            photoId = R.drawable.santa_hat,
+            category = Category.Headgear,
+            isActive = true
+        ),
+    ),
+    Category.Coat to listOf(
+
     ),
     Category.Blouse to listOf(
         Item(
@@ -66,6 +118,9 @@ val fakeItemsData: Map<Category, List<Item>> = mapOf(
             category = Category.Trousers,
             isActive = true
         )
+    ),
+    Category.Shorts to listOf(
+
     ),
     Category.Boots to listOf(
         Item(

@@ -28,7 +28,7 @@ fun getInitialCurrentSelection(items: Map<Category, List<Item>>): List<String> {
 class AppViewModel(context: Context) : ViewModel() {
     private val internalStorageHelper = InternalStorageHelper(context)
     private val loadedItemsMap = internalStorageHelper.getItemsMap()
-    private val loadedPhotosMap = internalStorageHelper.loadPhotos()
+    private val loadedPhotosMap = internalStorageHelper.loadPhotos().toMutableMap()
 
     private val _uiState = MutableStateFlow(AppUiState(
         items = loadedItemsMap,
@@ -114,6 +114,8 @@ class AppViewModel(context: Context) : ViewModel() {
             else {
                 newItems[newItem.category] = listOf(newItem)
             }
+
+            loadedPhotosMap[photoFilename] = bitmap
 
             _uiState.update { currentState ->
                 currentState.copy(

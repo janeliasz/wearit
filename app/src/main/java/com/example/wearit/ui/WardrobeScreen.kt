@@ -11,18 +11,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.wearit.model.Category
@@ -33,7 +27,7 @@ import java.util.*
 fun WardrobeScreen(
     goToPickerScreen: () -> Unit,
     onCategoryChange: (category: Category) -> Unit,
-    itemsOfCurrentCategory: List<Item>,
+    itemsOfCurrentCategory: List<Item>?,
     addItem: (bitmap: Bitmap) -> Boolean,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
 ) {
@@ -42,7 +36,7 @@ fun WardrobeScreen(
 
     Scaffold(
         content = { innerPadding ->
-            //giving padding to whole content (so it doesnt overlap with bottomBar
+            //giving padding to whole content so it doesnt overlap with bottomBar
             WardrobePageContent(
                 innerPadding = innerPadding,
                 onCategoryChange = onCategoryChange,
@@ -66,14 +60,14 @@ fun WardrobePageContent(
     innerPadding: PaddingValues,
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
-    itemsOfCurrentCategory: List<Item>,
+    itemsOfCurrentCategory: List<Item>?,
     addItem: (bitmap: Bitmap) -> Boolean,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
 ) {
     Box(modifier = Modifier.padding(innerPadding)) {
         Column() {
             WardrobeNavigationSection(
-                addItem = addItem
+                addItem = addItem,
             )
             WardrobeClothesListSection(
                 onCategoryChange = onCategoryChange,
@@ -89,10 +83,10 @@ fun WardrobePageContent(
 fun WardrobeClothesListSection(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
-    itemsOfCurrentCategory: List<Item>,
+    itemsOfCurrentCategory: List<Item>?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
 
-) {
+    ) {
     Row(
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier.fillMaxWidth()
@@ -129,7 +123,7 @@ fun WardrobeListOfCategories(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WardrobeListOfItemsFromCurrentCategory(
-    itemsOfCurrentCategory: List<Item>,
+    itemsOfCurrentCategory: List<Item>?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
 ) {
     Box(
@@ -138,16 +132,20 @@ fun WardrobeListOfItemsFromCurrentCategory(
         contentAlignment = Alignment.TopCenter
 
     ) {
-        LazyVerticalGrid(
-            cells = GridCells.Fixed(2)
-        )
-        {
-            items(itemsOfCurrentCategory) { item ->
-                SingleClothItem(
-                    item = item,
-                    getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
-                )
+        if (itemsOfCurrentCategory != null) {
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(2)
+            )
+            {
+                items(itemsOfCurrentCategory) { item ->
+                    SingleClothItem(
+                        item = item,
+                        getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
+                    )
+                }
             }
+        } else {
+            Text(text = "No items in category")
         }
     }
 }
@@ -181,7 +179,7 @@ fun SingleClothItem(
 
 @Composable
 fun WardrobeNavigationSection(
-    addItem: (bitmap: Bitmap) -> Boolean
+    addItem: (bitmap: Bitmap) -> Boolean,
 ) {
     val contentResolver = LocalContext.current.contentResolver
     val imagePicker = rememberLauncherForActivityResult(
@@ -211,8 +209,7 @@ fun WardrobeNavigationSection(
 @Composable
 fun BottomBarSpace(
     goToPickerScreen: () -> Unit,
-
-    ) {
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()

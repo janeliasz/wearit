@@ -2,7 +2,6 @@ package com.example.wearit
 
 import IntroScreen
 
-import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -40,15 +39,28 @@ fun WearItApp() {
         navController = navController,
         startDestination = WearItScreen.Intro.name
     ) {
-        composable(WearItScreen.Intro.name){
-            IntroScreen(navigateToPicker = {navController.navigate(WearItScreen.Picker.name)})
+        composable(WearItScreen.Intro.name) {
+            IntroScreen(navigateToPicker = { navController.navigate(WearItScreen.Picker.name) })
         }
         composable(WearItScreen.Picker.name) {
             PickerScreen(
                 onButtonClick = { navController.navigate(WearItScreen.Wardrobe.name) },
-                getItemPhotoByPhotoFilename = { itemId ->  viewModel.getItemPhotoByPhotoFilename(itemId)!! },
-                currentSelection = uiState.currentSelection.map { itemId -> viewModel.getItemById(itemId)!! },
-                changeSelectedItem = { category, next ->  viewModel.changeSelectedItem(category, next) }
+                getItemPhotoByPhotoFilename = { itemId ->
+                    viewModel.getItemPhotoByPhotoFilename(
+                        itemId
+                    )!!
+                },
+                currentSelection = uiState.currentSelection.map { itemId ->
+                    viewModel.getItemById(
+                        itemId
+                    )!!
+                },
+                changeSelectedItem = { category, next ->
+                    viewModel.changeSelectedItem(
+                        category,
+                        next
+                    )
+                }
             )
         }
 
@@ -56,10 +68,13 @@ fun WearItApp() {
             WardrobeScreen(
                 onCategoryChange = { viewModel.goToCategory(it) },
                 goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
-                itemsOfCurrentCategory = uiState.items[uiState.currentCategory]!!,
-            addItem = { bitmap -> viewModel.addItem("test", bitmap)},
-            getItemPhotoByPhotoFilename = { itemId ->  viewModel.getItemPhotoByPhotoFilename(itemId)!! },
-
+                itemsOfCurrentCategory = uiState.items[uiState.currentCategory],
+                addItem = { bitmap -> viewModel.addItem("test", bitmap) },
+                getItemPhotoByPhotoFilename = { itemId ->
+                    viewModel.getItemPhotoByPhotoFilename(
+                        itemId
+                    )!!
+                }
             )
         }
     }

@@ -60,7 +60,9 @@ fun WearItApp() {
                         category,
                         next
                     )
-                }
+                },
+                drawSelection = {viewModel.drawItems()}
+
             )
         }
 

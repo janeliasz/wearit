@@ -21,7 +21,8 @@ fun PickerScreen(
     onButtonClick: () -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     currentSelection: List<Item>,
-    changeSelectedItem: (category: Category, next: Boolean) -> Unit
+    changeSelectedItem: (category: Category, next: Boolean) -> Unit,
+    drawSelection: () -> Unit
 ) {
     Column {
         Text(text = "This is Picker screen.")
@@ -47,6 +48,10 @@ fun PickerScreen(
                     }
                 }
             }
+        }
+
+        Button(onClick = { drawSelection() }) {
+            Text(text = "Draw")
         }
     }
 }

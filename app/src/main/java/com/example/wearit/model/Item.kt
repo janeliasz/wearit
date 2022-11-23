@@ -1,13 +1,12 @@
 package com.example.wearit.model
 
-class Item(
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Item(
     val id: String,
     var name: String,
-    val photoId: Int,
+    val photoFilename: String,
     val category: Category,
     var isActive: Boolean = true
-) {
-    fun toggleActive(){
-        isActive = !isActive
-    }
-}
+)

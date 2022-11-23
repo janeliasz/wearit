@@ -95,8 +95,10 @@ class AppViewModel(context: Context) : ViewModel() {
         val newCurrentSelection = mutableListOf<String>()
 
         _uiState.value.items.forEach { entry ->
-            var list_of_active_items=entry.value.filter { it.isActive }
-            newCurrentSelection.add(list_of_active_items.random().id)
+            val listOfActiveItems=entry.value.filter { it.isActive }
+            if( listOfActiveItems.isNotEmpty()){
+                newCurrentSelection.add(listOfActiveItems.random().id)
+            }
         }
 
         _uiState.update { currentState ->

@@ -1,77 +1,62 @@
 package com.example.wearit.data
 
-import android.content.Context
+import android.app.Application
 import android.graphics.Bitmap
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.wearit.model.AppUiState
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import java.util.UUID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-fun getInitialCurrentSelection(items: Map<Category, List<Item>>): List<String> {
-    val selection = mutableListOf<String>()
+class AppViewModel(application: Application) : AndroidViewModel(application) {
+    private val internalStorageHelper = InternalStorageHelper(application.applicationContext)
+    private val loadedPhotos = internalStorageHelper.loadPhotos().toMutableMap()
 
-    items.forEach { entry ->
-        val activeItems = entry.value.filter { item -> item.isActive }
-        if (activeItems.isNotEmpty()) {
-            selection.add(activeItems[Random.nextInt(activeItems.size)].id)
-        }
+    private val repository: AppRepository
+    val getAllItems: StateFlow<List<Item>>
+
+    init {
+        val itemDao = AppDatabase.getInstance(application).itemDao()
+        repository = AppRepository(itemDao)
+        getAllItems = repository.getAllItems.stateIn(
+            initialValue = listOf(),
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000)
+        )
     }
 
-    return selection
-}
-
-class AppViewModel(context: Context) : ViewModel() {
-    private val internalStorageHelper = InternalStorageHelper(context)
-    private val loadedItemsMap = internalStorageHelper.getItemsMap()
-    private val loadedPhotosMap = internalStorageHelper.loadPhotos().toMutableMap()
-
-    private val _uiState = MutableStateFlow(AppUiState(
-        items = loadedItemsMap,
-        currentSelection = getInitialCurrentSelection(loadedItemsMap)
-    ))
+    private val _uiState = MutableStateFlow(
+        AppUiState(
+            currentSelection = listOf()
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
-    fun getItemById(id: String): Item? {
-        _uiState.value.items.forEach { entry ->
-            entry.value.forEach { item ->
-                if (item.id == id) return item
-            }
-        }
-        return null
+    fun getItemById(id: Int): Item? {
+        val itemList: List<Item> = getAllItems.value
+        return itemList.find { item -> item.id == id }
     }
 
-    fun getItemPhotoByPhotoFilename(id: String): Bitmap? {
-        return try {
-            loadedPhotosMap.entries.first { entry ->
-                entry.key.startsWith(id)
-            }.value
-        } catch (e: NoSuchElementException) {
-            e.printStackTrace()
-            null
-        }
-    }
-
-    fun goToCategory(category: Category) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                currentCategory = category
-            )
-        }
+    fun getItemPhotoByPhotoFilename(filename: String): Bitmap? {
+        return loadedPhotos.entries.find { entry ->
+            entry.key.startsWith(filename)
+        }?.value
     }
 
     fun changeSelectedItem(category: Category, next: Boolean) {
+        val itemList: List<Item> = getAllItems.value
+        val itemMap: Map<Category, List<Item>> = getItemMap(itemList)
+
         val newCurrentSelection = _uiState.value.currentSelection.map { itemId ->
-            val item = getItemById(itemId)!!
+            val item = getItemById(itemId) ?: return
 
             if (item.category != category)
                 itemId
             else {
-                val allItemsInCurrentItemCategory = _uiState.value.items.getValue(category)
+                val allItemsInCurrentItemCategory = itemMap.getValue(category)
                 val currentItemIndex = allItemsInCurrentItemCategory.indexOf(item)
                 var newCurrentItemIndex = currentItemIndex + if (next) 1 else -1
 
@@ -92,11 +77,14 @@ class AppViewModel(context: Context) : ViewModel() {
     }
 
     fun drawItems() {
-        val newCurrentSelection = mutableListOf<String>()
+        val itemList: List<Item> = getAllItems.value
+        val itemMap: Map<Category, List<Item>> = getItemMap(itemList)
 
-        _uiState.value.items.forEach { entry ->
-            val listOfActiveItems=entry.value.filter { it.isActive }
-            if( listOfActiveItems.isNotEmpty()){
+        val newCurrentSelection = mutableListOf<Int>()
+
+        itemMap.forEach { entry ->
+            val listOfActiveItems = entry.value.filter { it.isActive }
+            if (listOfActiveItems.isNotEmpty()) {
                 newCurrentSelection.add(listOfActiveItems.random().id)
             }
         }
@@ -108,40 +96,75 @@ class AppViewModel(context: Context) : ViewModel() {
         }
     }
 
+    fun saveItem(name: String, bitmap: Bitmap) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val photoFilename = internalStorageHelper.savePhoto(bitmap)
+            if (photoFilename != "") {
+                val newItem = Item(
+                    id = 0,
+                    name = name,
+                    photoFilename = photoFilename,
+                    category = _uiState.value.currentCategory
+                )
 
-    fun addItem(name: String, bitmap: Bitmap): Boolean {
-        val photoFilename = internalStorageHelper.savePhoto(bitmap)
-        if (photoFilename == "") return false
+                loadedPhotos[photoFilename] = bitmap
 
-        val newItem = Item(
-            id = UUID.randomUUID().toString(),
-            name = name,
-            photoFilename = photoFilename,
-            category = _uiState.value.currentCategory
-        )
-
-        val saved = internalStorageHelper.saveItem(newItem)
-
-        if (saved) {
-            val newItems = _uiState.value.items.toMutableMap()
-            if (newItems.containsKey(newItem.category)) {
-                val mutableList = newItems.getValue(newItem.category).toMutableList()
-                mutableList.add(newItem)
-                newItems[newItem.category] = mutableList
+                repository.addItem(item = newItem)
             }
-            else {
-                newItems[newItem.category] = listOf(newItem)
-            }
+        }
+    }
 
-            loadedPhotosMap[photoFilename] = bitmap
+    fun updateItem(item: Item) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateItem(item)
+        }
+    }
 
+    fun deleteItem(item: Item) {
+        viewModelScope.launch(Dispatchers.IO) {
+            internalStorageHelper.deleteFile(item.photoFilename)
+            repository.deleteItem(item)
             _uiState.update { currentState ->
                 currentState.copy(
-                    items = newItems
+                    currentSelection = _uiState.value.currentSelection.filter { id -> id != item.id }
                 )
             }
         }
-
-        return saved
     }
+
+    fun goToCategory(category: Category) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                currentCategory = category
+            )
+        }
+    }
+}
+
+fun getInitialCurrentSelection(items: Map<Category, List<Item>>): List<Int> {
+    val selection = mutableListOf<Int>()
+
+    items.forEach { entry ->
+        val activeItems = entry.value.filter { item -> item.isActive }
+        if (activeItems.isNotEmpty()) {
+            selection.add(activeItems[Random.nextInt(activeItems.size)].id)
+        }
+    }
+
+    return selection
+}
+
+fun getItemMap(itemList: List<Item>): Map<Category, List<Item>> {
+    val itemsMap = mutableMapOf<Category, MutableList<Item>>()
+
+    itemList.forEach { item ->
+        if (itemsMap.containsKey(item.category)) {
+            itemsMap.getValue(item.category).add(item)
+        }
+        else {
+            itemsMap[item.category] = mutableListOf(item)
+        }
+    }
+
+    return itemsMap
 }

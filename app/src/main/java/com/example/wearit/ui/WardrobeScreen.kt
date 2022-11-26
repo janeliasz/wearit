@@ -28,12 +28,11 @@ fun WardrobeScreen(
     goToPickerScreen: () -> Unit,
     onCategoryChange: (category: Category) -> Unit,
     itemsOfCurrentCategory: List<Item>?,
-    addItem: (bitmap: Bitmap) -> Boolean,
+    saveItem: (bitmap: Bitmap) -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
 ) {
 
     val listOfCategories = Category.values().asList()
-
     Scaffold(
         content = { innerPadding ->
             //giving padding to whole content so it doesnt overlap with bottomBar
@@ -42,7 +41,7 @@ fun WardrobeScreen(
                 onCategoryChange = onCategoryChange,
                 listOfCategories = listOfCategories,
                 itemsOfCurrentCategory = itemsOfCurrentCategory,
-                addItem = addItem,
+                saveItem = saveItem,
                 getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
             )
         },
@@ -61,13 +60,13 @@ fun WardrobePageContent(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
     itemsOfCurrentCategory: List<Item>?,
-    addItem: (bitmap: Bitmap) -> Boolean,
+    saveItem: (bitmap: Bitmap) -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
 ) {
     Box(modifier = Modifier.padding(innerPadding)) {
         Column() {
             WardrobeNavigationSection(
-                addItem = addItem,
+                saveItem = saveItem,
             )
             WardrobeClothesListSection(
                 onCategoryChange = onCategoryChange,
@@ -84,8 +83,7 @@ fun WardrobeClothesListSection(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
     itemsOfCurrentCategory: List<Item>?,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
-
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
     ) {
     Row(
         horizontalArrangement = Arrangement.Start,
@@ -124,7 +122,7 @@ fun WardrobeListOfCategories(
 @Composable
 fun WardrobeListOfItemsFromCurrentCategory(
     itemsOfCurrentCategory: List<Item>?,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
 ) {
     Box(
         Modifier
@@ -153,7 +151,7 @@ fun WardrobeListOfItemsFromCurrentCategory(
 @Composable
 fun SingleClothItem(
     item: Item,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
 ) {
     Column(
         Modifier
@@ -167,7 +165,6 @@ fun SingleClothItem(
             modifier = Modifier
                 .size(100.dp)
                 .padding(5.dp, 10.dp, 5.dp, 0.dp)
-
         )
         Text(
             text = item.name, textAlign = TextAlign.Center, modifier = Modifier
@@ -179,7 +176,7 @@ fun SingleClothItem(
 
 @Composable
 fun WardrobeNavigationSection(
-    addItem: (bitmap: Bitmap) -> Boolean,
+    saveItem: (bitmap: Bitmap) -> Unit,
 ) {
     val contentResolver = LocalContext.current.contentResolver
     val imagePicker = rememberLauncherForActivityResult(
@@ -187,7 +184,7 @@ fun WardrobeNavigationSection(
         onResult = { uri ->
             val bitmap = getBitmap(contentResolver, uri)
             if (bitmap != null) {
-                addItem(bitmap)
+                saveItem(bitmap)
             }
         }
     )

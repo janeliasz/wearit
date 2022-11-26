@@ -1,7 +1,6 @@
 package com.example.wearit.model
 
 data class AppUiState(
-    val items: Map<Category, List<Item>>,
-    val currentSelection: List<String>,
+    val currentSelection: List<Int>,
     val currentCategory: Category = Category.Headgear,
 )

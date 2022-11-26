@@ -1,10 +1,12 @@
 package com.example.wearit.model
 
-import kotlinx.serialization.Serializable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Serializable
+@Entity
 data class Item(
-    val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
     var name: String,
     val photoFilename: String,
     val category: Category,

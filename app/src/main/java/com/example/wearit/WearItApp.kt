@@ -1,13 +1,8 @@
 package com.example.wearit
 
 import IntroScreen
-
+import android.app.Application
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import android.graphics.BitmapFactory
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -28,10 +23,9 @@ enum class WearItScreen() {
 @Preview
 @Composable
 fun WearItApp() {
-    val context = LocalContext.current
-
-    val viewModel = AppViewModel(LocalContext.current)
+    val viewModel = AppViewModel(LocalContext.current.applicationContext as Application)
     val uiState by viewModel.uiState.collectAsState()
+    val items by viewModel.getAllItems.collectAsState()
 
     val navController = rememberNavController()
 
@@ -50,10 +44,10 @@ fun WearItApp() {
                         itemId
                     )!!
                 },
-                currentSelection = uiState.currentSelection.map { itemId ->
+                currentSelection = uiState.currentSelection.mapNotNull { itemId ->
                     viewModel.getItemById(
                         itemId
-                    )!!
+                    )
                 },
                 changeSelectedItem = { category, next ->
                     viewModel.changeSelectedItem(
@@ -70,8 +64,8 @@ fun WearItApp() {
             WardrobeScreen(
                 onCategoryChange = { viewModel.goToCategory(it) },
                 goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
-                itemsOfCurrentCategory = uiState.items[uiState.currentCategory],
-                addItem = { bitmap -> viewModel.addItem("test", bitmap) },
+                itemsOfCurrentCategory = items.filter { item -> item.category == uiState.currentCategory },
+                saveItem = { bitmap -> viewModel.saveItem("test", bitmap) },
                 getItemPhotoByPhotoFilename = { itemId ->
                     viewModel.getItemPhotoByPhotoFilename(
                         itemId
@@ -81,4 +75,3 @@ fun WearItApp() {
         }
     }
 }
-//

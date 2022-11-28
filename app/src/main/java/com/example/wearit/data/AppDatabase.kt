@@ -8,7 +8,9 @@ import com.example.wearit.model.Item
 
 @Database(entities = [Item::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
+
     abstract fun itemDao(): ItemDao
+    abstract fun outfitDao(): OutfitDao
 
     companion object {
         private var INSTANCE: AppDatabase? = null

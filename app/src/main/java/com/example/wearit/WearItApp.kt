@@ -55,7 +55,8 @@ fun WearItApp() {
                         next
                     )
                 },
-                drawSelection = {viewModel.drawItems()}
+                drawSelection = {viewModel.drawItems()},
+                saveOutfit = {viewModel.saveOutfit()}
 
             )
         }

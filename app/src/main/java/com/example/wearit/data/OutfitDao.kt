@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface OutfitDao {
-    @Query("SELECT * FROM Item")
+    @Query("SELECT * FROM Outfit")
     fun getAll(): Flow<List<Outfit>>
 
     @Insert

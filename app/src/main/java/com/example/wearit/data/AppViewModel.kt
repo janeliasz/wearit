@@ -139,6 +139,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
     }
+    fun setItemActiveInactive(item: Item){
+        _uiState.update { currentState ->
+            item.isActive = !item.isActive
+            currentState.copy(
+            )
+        }
+    }
 }
 
 fun getInitialCurrentSelection(items: Map<Category, List<Item>>): List<Int> {

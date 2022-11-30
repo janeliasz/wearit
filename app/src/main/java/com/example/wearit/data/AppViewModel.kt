@@ -6,6 +6,7 @@ import androidx.lifecycle.*
 import com.example.wearit.model.AppUiState
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
+import com.example.wearit.model.Outfit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -17,15 +18,26 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: AppRepository
     val getAllItems: StateFlow<List<Item>>
+    val getAllOutfits: StateFlow<List<Outfit>>
 
     init {
         val itemDao = AppDatabase.getInstance(application).itemDao()
-        repository = AppRepository(itemDao)
+        val outfitDao = AppDatabase.getInstance(application).outfitDao()
+
+        repository = AppRepository(itemDao,outfitDao)
+
         getAllItems = repository.getAllItems.stateIn(
             initialValue = listOf(),
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000)
         )
+
+        getAllOutfits = repository.getAllOutfits.stateIn(
+            initialValue = listOf(),
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000)
+        )
+
     }
 
     private val _uiState = MutableStateFlow(
@@ -139,6 +151,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
     }
+
+
+    fun saveOutfit() {
+        viewModelScope.launch(Dispatchers.IO) {
+
+                val newOutfit = Outfit(
+                    id = 0,
+                    itemsInOutfit = _uiState.value.currentSelection
+                )
+                repository.addOutfit(outfit = newOutfit)
+        }
+    }
 }
 
 fun getInitialCurrentSelection(items: Map<Category, List<Item>>): List<Int> {
@@ -168,3 +192,4 @@ fun getItemMap(itemList: List<Item>): Map<Category, List<Item>> {
 
     return itemsMap
 }
+

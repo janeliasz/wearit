@@ -1,14 +1,17 @@
 package com.example.wearit.data
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 import com.example.wearit.model.Item
+import com.example.wearit.model.Outfit
+import com.google.gson.Gson
 
-@Database(entities = [Item::class], version = 1, exportSchema = false)
+@Database(entities = [Item::class, Outfit::class], version = 1, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
+
     abstract fun itemDao(): ItemDao
+    abstract fun outfitDao(): OutfitDao
 
     companion object {
         private var INSTANCE: AppDatabase? = null
@@ -32,5 +35,17 @@ abstract class AppDatabase : RoomDatabase() {
                 return instance
             }
         }
+    }
+}
+
+class Converters {
+    @TypeConverter
+    fun listToJson(list: List<Int>): String {
+        return Gson().toJson(list)
+    }
+
+    @TypeConverter
+    fun jsonToList(value: String): List<Int> {
+        return Gson().fromJson(value, Array<Int>::class.java).toList()
     }
 }

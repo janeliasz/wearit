@@ -38,7 +38,7 @@ fun WearItApp() {
         }
         composable(WearItScreen.Picker.name) {
             PickerScreen(
-                onButtonClick = { navController.navigate(WearItScreen.Wardrobe.name) },
+                goToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
                 getItemPhotoByPhotoFilename = { itemId ->
                     viewModel.getItemPhotoByPhotoFilename(
                         itemId

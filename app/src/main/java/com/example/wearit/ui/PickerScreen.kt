@@ -18,7 +18,7 @@ import com.example.wearit.model.Item
 
 @Composable
 fun PickerScreen(
-    onButtonClick: () -> Unit,
+    goToWardrobe: () -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     currentSelection: List<Item>,
     changeSelectedItem: (category: Category, next: Boolean) -> Unit,
@@ -27,9 +27,7 @@ fun PickerScreen(
 ) {
     Column {
         Text(text = "This is Picker screen.")
-        Button(onClick = onButtonClick) {
-            Text(text = "Go to Wardrobe")
-        }
+
 
         LazyColumn {
             items(currentSelection) { item ->
@@ -51,14 +49,18 @@ fun PickerScreen(
             }
         }
 
-        Button(onClick = { drawSelection() }) {
-            Text(text = "Draw")
-        }
-    }
-    Row{
-        Button(onClick = {saveOutfit()}) {
-            Text(text="Save outfit")
-        }
+        Row{
+            Button(onClick = {saveOutfit()}) {
+                Text(text="Save outfit")
+            }
+            Button(onClick = { drawSelection() }) {
+                Text(text = "Draw")
+            }
+            Button(onClick = {goToWardrobe()}) {
+                Text(text = "Go to Wardrobe")
+            }
 
+        }
     }
+
 }

@@ -2,6 +2,7 @@ package com.example.wearit.data
 
 import com.example.wearit.model.Item
 import com.example.wearit.model.Outfit
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 
 class AppRepository(private val itemDao: ItemDao,private val outfitDao: OutfitDao) {
@@ -34,5 +35,9 @@ class AppRepository(private val itemDao: ItemDao,private val outfitDao: OutfitDa
 
     suspend fun deleteOutfit(outfit: Outfit) {
         outfitDao.delete(outfit)
+    }
+
+    fun findOutfit(selected: List<Int>): Int? {
+        return outfitDao.getOutfit(Gson().toJson(selected))
     }
 }

@@ -17,4 +17,7 @@ interface OutfitDao {
 
     @Delete
     suspend fun delete(outfit: Outfit)
+
+    @Query("SELECT id FROM Outfit WHERE itemsInOutfit =:selected")
+    fun getOutfit(selected: String): Int?
 }

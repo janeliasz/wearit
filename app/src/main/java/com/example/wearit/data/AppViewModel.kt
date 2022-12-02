@@ -1,7 +1,10 @@
 package com.example.wearit.data
 
 import android.app.Application
+import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.lifecycle.*
 import com.example.wearit.model.AppUiState
 import com.example.wearit.model.Category
@@ -11,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val internalStorageHelper = InternalStorageHelper(application.applicationContext)
@@ -155,12 +159,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun saveOutfit() {
         viewModelScope.launch(Dispatchers.IO) {
+                Log.d("Outfits", getAllOutfits.value.toString())
+                Log.d("Outfit size", ""+getAllOutfits.value.size)
 
-                val newOutfit = Outfit(
-                    id = 0,
-                    itemsInOutfit = _uiState.value.currentSelection
-                )
-                repository.addOutfit(outfit = newOutfit)
+                if(repository.findOutfit( _uiState.value.currentSelection ) == null){
+                    val newOutfit = Outfit(
+                        id = 0,
+                        itemsInOutfit = _uiState.value.currentSelection
+                    )
+                    repository.addOutfit(outfit = newOutfit)
+                }
         }
     }
 }
@@ -180,6 +188,7 @@ fun getInitialCurrentSelection(items: Map<Category, List<Item>>): List<Int> {
 
 fun getItemMap(itemList: List<Item>): Map<Category, List<Item>> {
     val itemsMap = mutableMapOf<Category, MutableList<Item>>()
+
 
     itemList.forEach { item ->
         if (itemsMap.containsKey(item.category)) {

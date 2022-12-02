@@ -26,6 +26,7 @@ fun WearItApp() {
     val viewModel = AppViewModel(LocalContext.current.applicationContext as Application)
     val uiState by viewModel.uiState.collectAsState()
     val items by viewModel.getAllItems.collectAsState()
+    val outfits by viewModel.getAllOutfits.collectAsState()
 
     val navController = rememberNavController()
 

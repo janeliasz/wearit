@@ -71,7 +71,8 @@ fun WearItApp() {
                         itemId
                     )!!
                 },
-                setActiveInactive = { viewModel.setItemActiveInactive(it) }
+                setActiveInactive = { viewModel.setItemActiveInactive(it) },
+                currentCategory = uiState.currentCategory
             )
         }
     }

@@ -10,16 +10,22 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.wearit.R
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
 import java.util.*
@@ -32,6 +38,7 @@ fun WardrobeScreen(
     saveItem: (bitmap: Bitmap) -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
+    currentCategory: Category,
 ) {
 
     val listOfCategories = Category.values().asList()
@@ -45,7 +52,8 @@ fun WardrobeScreen(
                 itemsOfCurrentCategory = itemsOfCurrentCategory,
                 saveItem = saveItem,
                 getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
-                setActiveInactive = setActiveInactive
+                setActiveInactive = setActiveInactive,
+                currentCategory = currentCategory
             )
         },
         bottomBar = {
@@ -66,6 +74,7 @@ fun WardrobePageContent(
     saveItem: (bitmap: Bitmap) -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
+    currentCategory: Category
 
     ) {
     Box(modifier = Modifier.padding(innerPadding)) {
@@ -78,7 +87,8 @@ fun WardrobePageContent(
                 listOfCategories = listOfCategories,
                 itemsOfCurrentCategory = itemsOfCurrentCategory,
                 getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
-                setActiveInactive = setActiveInactive
+                setActiveInactive = setActiveInactive,
+                currentCategory = currentCategory,
             )
         }
     }
@@ -91,6 +101,7 @@ fun WardrobeClothesListSection(
     itemsOfCurrentCategory: List<Item>?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
+    currentCategory: Category
 
     ) {
     Row(
@@ -100,6 +111,7 @@ fun WardrobeClothesListSection(
         WardrobeListOfCategories(
             onCategoryChange = onCategoryChange,
             listOfCategories = listOfCategories,
+            currentCategory = currentCategory
         )
         WardrobeListOfItemsFromCurrentCategory(
             itemsOfCurrentCategory = itemsOfCurrentCategory,
@@ -113,17 +125,50 @@ fun WardrobeClothesListSection(
 fun WardrobeListOfCategories(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
+    currentCategory: Category,
 ) {
-    Column() {
-        Column {
-            LazyColumn {
-                items(listOfCategories) { category ->
-                    Button(onClick = { onCategoryChange(category) }) {
-                        Text(text = "Go to $category")
-                    }
+    val columnPadding = 7.dp
+    Column {
+
+
+
+        LazyColumn {
+
+            itemsIndexed(listOfCategories) { index, category ->
+
+                TextButton(
+                    modifier = Modifier
+                        .animateContentSize()
+                        .size(if (category == currentCategory) 80.dp else 60.dp)
+//                        .offset(y = -columnPadding*index)
+                        .clip(RoundedCornerShape(0.dp, 50.dp, 50.dp, 0.dp))
+                        .background(if (category == currentCategory) Color(0x47FF4848) else Color.White)
+                        .border(
+                            width = 9.dp,
+                            color = Color.Red,
+                            shape = RoundedCornerShape(0.dp, 50.dp, 50.dp, 0.dp)
+                        ),
+
+//                    colors = ButtonDefaults.buttonColors(
+//                        backgroundColor = Color.Red),
+                    onClick = { onCategoryChange(category) }
+                ) {
+//                        Text(text = "Go to $category")
+                    Icon(
+                        painter = painterResource(id = category.icon),
+                        tint = if (category==currentCategory) Color.Red else Color.Red,
+                        contentDescription = "$category",
+                        modifier = Modifier
+                            .offset(x = (-4).dp)
+                            .padding(10.dp)
+//                            .size(60.dp)
+                    )
                 }
             }
+
         }
+
+
     }
 }
 
@@ -210,7 +255,9 @@ fun WardrobeNavigationSection(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(100.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Button(onClick = { imagePicker.launch("image/*") }) {
             Text(text = "Add")
@@ -226,14 +273,18 @@ fun WardrobeNavigationSection(
 fun BottomBarSpace(
     goToPickerScreen: () -> Unit,
 ) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp),
-        contentAlignment = Alignment.Center
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Button(onClick = { goToPickerScreen() }) {
             Text(text = "DRAW")
+        }
+        Button(onClick = { /*TODO*/ }) {
+            Text(text = "FAVOURITES")
         }
     }
 }
@@ -250,3 +301,4 @@ fun getBitmap(contentResolver: ContentResolver, fileUri: Uri?): Bitmap? {
         null
     }
 }
+

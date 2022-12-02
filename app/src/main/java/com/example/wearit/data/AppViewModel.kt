@@ -1,10 +1,7 @@
 package com.example.wearit.data
 
 import android.app.Application
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.lifecycle.*
 import com.example.wearit.model.AppUiState
 import com.example.wearit.model.Category
@@ -159,8 +156,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun saveOutfit() {
         viewModelScope.launch(Dispatchers.IO) {
-                Log.d("Outfits", getAllOutfits.value.toString())
-                Log.d("Outfit size", ""+getAllOutfits.value.size)
 
                 if(repository.findOutfit( _uiState.value.currentSelection ) == null){
                     val newOutfit = Outfit(

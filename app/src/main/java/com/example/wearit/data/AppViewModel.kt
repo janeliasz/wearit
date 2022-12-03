@@ -125,6 +125,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+    fun setItemActiveInactive(item: Item){
+        updateItem(item.copy(isActive = !item.isActive))
+    }
 
     fun updateItem(item: Item) {
         viewModelScope.launch(Dispatchers.IO) {

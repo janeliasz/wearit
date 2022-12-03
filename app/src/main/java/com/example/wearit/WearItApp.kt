@@ -71,7 +71,8 @@ fun WearItApp() {
                     viewModel.getItemPhotoByPhotoFilename(
                         itemId
                     )!!
-                }
+                },
+                setActiveInactive = { viewModel.setItemActiveInactive(it) },
             )
         }
     }

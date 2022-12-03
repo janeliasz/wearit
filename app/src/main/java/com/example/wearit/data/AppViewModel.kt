@@ -2,6 +2,7 @@ package com.example.wearit.data
 
 import android.app.Application
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.lifecycle.*
 import com.example.wearit.model.AppUiState
 import com.example.wearit.model.Category
@@ -24,7 +25,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val itemDao = AppDatabase.getInstance(application).itemDao()
         val outfitDao = AppDatabase.getInstance(application).outfitDao()
 
-        repository = AppRepository(itemDao,outfitDao)
+        repository = AppRepository(itemDao, outfitDao)
 
         getAllItems = repository.getAllItems.stateIn(
             initialValue = listOf(),
@@ -90,7 +91,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun drawItems() {
         val itemList: List<Item> = getAllItems.value
-        val itemMap: Map<Category, List<Item>> = getItemMap(itemList)
+        val itemMap: Map<Category, List<Item>> = getItemMap(itemList.sortedBy { it.category })
 
         val newCurrentSelection = mutableListOf<Int>()
 
@@ -125,7 +126,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-    fun setItemActiveInactive(item: Item){
+
+    fun setItemActiveInactive(item: Item) {
         updateItem(item.copy(isActive = !item.isActive))
     }
 
@@ -158,12 +160,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun saveOutfit() {
         viewModelScope.launch(Dispatchers.IO) {
-
+            if (!getAllOutfits.value.any { it.itemsInOutfit.sorted() == _uiState.value.currentSelection.sorted() }
+                && _uiState.value.currentSelection.isNotEmpty()) {
                 val newOutfit = Outfit(
                     id = 0,
                     itemsInOutfit = _uiState.value.currentSelection
                 )
                 repository.addOutfit(outfit = newOutfit)
+            }
         }
     }
 }
@@ -182,13 +186,13 @@ fun getInitialCurrentSelection(items: Map<Category, List<Item>>): List<Int> {
 }
 
 fun getItemMap(itemList: List<Item>): Map<Category, List<Item>> {
+
     val itemsMap = mutableMapOf<Category, MutableList<Item>>()
 
     itemList.forEach { item ->
         if (itemsMap.containsKey(item.category)) {
             itemsMap.getValue(item.category).add(item)
-        }
-        else {
+        } else {
             itemsMap[item.category] = mutableListOf(item)
         }
     }

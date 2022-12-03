@@ -1,3 +1,4 @@
+package com.example.wearit.model
 import com.example.wearit.R
 
 enum class Category(val icon: Int) {

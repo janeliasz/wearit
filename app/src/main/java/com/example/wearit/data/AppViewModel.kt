@@ -49,7 +49,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val uiState = _uiState.asStateFlow()
 
     fun getItemById(id: Int): Item? {
-        val itemList: List<Item> = getAllItems.value.sortedBy { it.category }
+        val itemList: List<Item> = getAllItems.value
         return itemList.find { item -> item.id == id }
     }
 
@@ -91,7 +91,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun drawItems() {
         val itemList: List<Item> = getAllItems.value
-        val itemMap: Map<Category, List<Item>> = getItemMap(itemList)
+        val itemMap: Map<Category, List<Item>> = getItemMap(itemList.sortedBy { it.category })
 
         val newCurrentSelection = mutableListOf<Int>()
 
@@ -160,8 +160,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun saveOutfit() {
         viewModelScope.launch(Dispatchers.IO) {
-
-            if (!getAllOutfits.value.any { it.itemsInOutfit == _uiState.value.currentSelection }
+            if (!getAllOutfits.value.any { it.itemsInOutfit.sorted() == _uiState.value.currentSelection.sorted() }
                 && _uiState.value.currentSelection.isNotEmpty()) {
                 val newOutfit = Outfit(
                     id = 0,

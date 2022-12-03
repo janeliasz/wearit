@@ -29,7 +29,8 @@ fun WardrobeScreen(
     onCategoryChange: (category: Category) -> Unit,
     itemsOfCurrentCategory: List<Item>?,
     saveItem: (bitmap: Bitmap) -> Unit,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    setActiveInactive: (item: Item) -> Unit,
 ) {
 
     val listOfCategories = Category.values().asList()
@@ -42,7 +43,8 @@ fun WardrobeScreen(
                 listOfCategories = listOfCategories,
                 itemsOfCurrentCategory = itemsOfCurrentCategory,
                 saveItem = saveItem,
-                getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
+                getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
+                setActiveInactive = setActiveInactive
             )
         },
         bottomBar = {
@@ -61,7 +63,8 @@ fun WardrobePageContent(
     listOfCategories: List<Category>,
     itemsOfCurrentCategory: List<Item>?,
     saveItem: (bitmap: Bitmap) -> Unit,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    setActiveInactive: (item: Item) -> Unit,
 ) {
     Box(modifier = Modifier.padding(innerPadding)) {
         Column() {
@@ -72,7 +75,8 @@ fun WardrobePageContent(
                 onCategoryChange = onCategoryChange,
                 listOfCategories = listOfCategories,
                 itemsOfCurrentCategory = itemsOfCurrentCategory,
-                getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
+                getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
+                setActiveInactive = setActiveInactive
             )
         }
     }
@@ -83,7 +87,8 @@ fun WardrobeClothesListSection(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
     itemsOfCurrentCategory: List<Item>?,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    setActiveInactive: (item: Item) -> Unit,
     ) {
     Row(
         horizontalArrangement = Arrangement.Start,
@@ -95,7 +100,8 @@ fun WardrobeClothesListSection(
         )
         WardrobeListOfItemsFromCurrentCategory(
             itemsOfCurrentCategory = itemsOfCurrentCategory,
-            getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
+            getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
+            setActiveInactive = setActiveInactive
         )
     }
 }
@@ -122,7 +128,8 @@ fun WardrobeListOfCategories(
 @Composable
 fun WardrobeListOfItemsFromCurrentCategory(
     itemsOfCurrentCategory: List<Item>?,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    setActiveInactive: (item: Item) -> Unit,
 ) {
     Box(
         Modifier
@@ -138,7 +145,8 @@ fun WardrobeListOfItemsFromCurrentCategory(
                 items(itemsOfCurrentCategory) { item ->
                     SingleClothItem(
                         item = item,
-                        getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
+                        getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
+                        setActiveInactive = setActiveInactive
                     )
                 }
             }
@@ -151,14 +159,19 @@ fun WardrobeListOfItemsFromCurrentCategory(
 @Composable
 fun SingleClothItem(
     item: Item,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    setActiveInactive: (item: Item) -> Unit,
 ) {
     Column(
         Modifier
-            .padding(3.dp),
+            .padding(3.dp)
+            .clickable { setActiveInactive(item) },
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
+        Text(text = "${item.isActive}", textAlign = TextAlign.Center, modifier = Modifier
+            .padding(5.dp, 0.dp, 5.dp, 10.dp))
+
         Image(
             bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
             contentDescription = item.name,

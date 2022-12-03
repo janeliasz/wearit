@@ -7,7 +7,6 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
@@ -26,9 +25,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.wearit.R
+import com.example.wearit.components.ButtonType
+import com.example.wearit.components.MasterButton
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
-import java.util.*
 
 @Composable
 fun WardrobeScreen(
@@ -280,12 +280,63 @@ fun BottomBarSpace(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(onClick = { goToPickerScreen() }) {
-            Text(text = "DRAW")
-        }
-        Button(onClick = { /*TODO*/ }) {
-            Text(text = "FAVOURITES")
-        }
+
+
+
+        MasterButton(
+            type = ButtonType.RED,
+            onClick = goToPickerScreen,
+            modifier = Modifier
+//                .height(50.dp)
+            ,
+//            content = Text(text = "XD"),
+            icon = R.drawable.dice,
+            text = "DRAW",
+            width = 150.dp
+        )
+        MasterButton(
+            type = ButtonType.RED,
+            onClick = goToPickerScreen,
+            modifier = Modifier
+//                .height(50.dp),
+//            content = Text(text = "XD")
+            ,
+            icon = R.drawable.santa_hat,
+            text = "SETTINGS",
+            width = 150.dp
+        )
+//        Button(onClick = { goToPickerScreen() }) {
+//            Text(text = "DRAW")
+//        }
+//        Button(
+//            onClick = { },
+//            modifier = Modifier
+//                .background(MainRed),
+//            border = BorderStroke(1.dp, Color.Red),
+//            shape = RoundedCornerShape(50), // = 50% percent
+//            // or shape = CircleShape
+//            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red)
+//        ) {
+//            Text(text = "Save")
+//        }
+//        TextButton(
+//            modifier = Modifier
+//                .animateContentSize()
+//                .clip(RoundedCornerShape(0.dp, 50.dp, 50.dp, 0.dp))
+//                .background(MainRed)
+//                .border(
+//                    width = 9.dp,
+//                    color = Color.Red,
+//                    shape = RoundedCornerShape(0.dp, 50.dp, 50.dp, 0.dp)
+//                ),
+//
+////                    colors = ButtonDefaults.buttonColors(
+////                        backgroundColor = Color.Red),
+//            onClick = { }
+//        ) {
+//            Text(text = "Go to ")
+//
+//        }
     }
 }
 

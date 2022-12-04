@@ -17,8 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.wearit.R
+import com.example.wearit.components.ButtonType
+import com.example.wearit.components.MasterButton
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
 import java.util.*
@@ -31,7 +35,9 @@ fun WardrobeScreen(
     saveItem: (bitmap: Bitmap) -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
-) {
+    goToSettings: () -> Unit,
+
+    ) {
 
     val listOfCategories = Category.values().asList()
     Scaffold(
@@ -44,7 +50,8 @@ fun WardrobeScreen(
                 itemsOfCurrentCategory = itemsOfCurrentCategory,
                 saveItem = saveItem,
                 getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
-                setActiveInactive = setActiveInactive
+                setActiveInactive = setActiveInactive,
+                goToSettings = goToSettings
             )
         },
         bottomBar = {
@@ -65,11 +72,22 @@ fun WardrobePageContent(
     saveItem: (bitmap: Bitmap) -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
-) {
+    goToSettings: () -> Unit,
+
+    ) {
     Box(modifier = Modifier.padding(innerPadding)) {
         Column() {
             WardrobeNavigationSection(
                 saveItem = saveItem,
+                goToSettings = goToSettings
+            )
+
+            Divider(
+                color = MaterialTheme.colors.primary,
+                thickness = 4.dp,
+                modifier = Modifier
+                    .padding(20.dp, 0.dp, 20.dp, 10.dp)
+                    .offset(y = -10.dp)
             )
             WardrobeClothesListSection(
                 onCategoryChange = onCategoryChange,
@@ -161,7 +179,8 @@ fun SingleClothItem(
     item: Item,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
-) {
+
+    ) {
     Column(
         Modifier
             .padding(3.dp)
@@ -190,7 +209,10 @@ fun SingleClothItem(
 @Composable
 fun WardrobeNavigationSection(
     saveItem: (bitmap: Bitmap) -> Unit,
-) {
+    goToSettings: () -> Unit,
+
+
+    ) {
     val contentResolver = LocalContext.current.contentResolver
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -201,16 +223,41 @@ fun WardrobeNavigationSection(
             }
         }
     )
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-    ) {
-        Button(onClick = { imagePicker.launch("image/*") }) {
-            Text(text = "Add")
-        }
-        Button(onClick = { /*TODO*/ }) {
-            Text(text = "EDIT")
+    Box(){
+        Icon(painterResource(
+            id = R.drawable.settings),
+            contentDescription = "settings",
+            modifier = Modifier
+                .size(30.dp)
+                .align(Alignment.TopEnd)
+                .padding(0.dp, 5.dp, 5 .dp, 0.dp)
+                .clickable { goToSettings() }
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+
+        ) {
+            MasterButton(
+                type = ButtonType.RED,
+                onClick = { imagePicker.launch("image/*") },
+                modifier = Modifier,
+                icon = R.drawable.camera,
+                text = "ADD",
+                width = 180.dp
+            )
+
+            MasterButton(
+                type = ButtonType.WHITE,
+                onClick = { /*todo*/ },
+                modifier = Modifier,
+                icon = R.drawable.editing,
+                text = "EDIT",
+                width = 180.dp
+            )
         }
     }
 }
@@ -220,15 +267,30 @@ fun WardrobeNavigationSection(
 fun BottomBarSpace(
     goToPickerScreen: () -> Unit,
 ) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp),
-        contentAlignment = Alignment.Center
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Button(onClick = { goToPickerScreen() }) {
-            Text(text = "DRAW")
-        }
+        MasterButton(
+            type = ButtonType.RED,
+            onClick = goToPickerScreen,
+            modifier = Modifier,
+            icon = R.drawable.dice,
+            text = "DRAW",
+            width = 180.dp
+        )
+
+        MasterButton(
+            type = ButtonType.WHITE,
+            onClick = { TODO() },
+            modifier = Modifier,
+            icon = null,
+            text = "FAVOURITES",
+            width = 180.dp,
+        )
     }
 }
 

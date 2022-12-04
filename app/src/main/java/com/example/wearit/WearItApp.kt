@@ -17,7 +17,8 @@ import com.example.wearit.ui.WardrobeScreen
 enum class WearItScreen() {
     Intro,
     Picker,
-    Wardrobe
+    Wardrobe,
+    Settings
 }
 
 @Preview
@@ -74,7 +75,9 @@ fun WearItApp() {
                     )!!
                 },
                 setActiveInactive = { viewModel.setItemActiveInactive(it) },
-            )
+                goToSettings = { navController.navigate(WearItScreen.Settings.name) },
+
+                )
         }
     }
 }

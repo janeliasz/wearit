@@ -133,7 +133,7 @@ fun WardrobeListOfCategories(
 
         LazyColumn {
 
-            itemsIndexed(listOfCategories) { index, category ->
+            items(listOfCategories) { category ->
 
                 TextButton(
                     modifier = Modifier

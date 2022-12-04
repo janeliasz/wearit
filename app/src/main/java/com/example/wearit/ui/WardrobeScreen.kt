@@ -303,7 +303,7 @@ fun AddItemDialog(
     saveItem: (bitmap: Bitmap) -> Unit
 ) {
     var showOriginal by remember { mutableStateOf(true) }
-    
+
     Dialog(
         onDismissRequest = closeDialog
     ) {

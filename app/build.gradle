@@ -70,4 +70,6 @@ dependencies {
     implementation 'androidx.room:room-ktx:2.2.1'
 
     implementation 'com.google.code.gson:gson:2.8.8'
+
+    implementation 'com.github.GhayasAhmad:auto-background-remover:1.0.3'
 }

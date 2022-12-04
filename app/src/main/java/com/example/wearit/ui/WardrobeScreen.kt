@@ -7,6 +7,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -19,8 +20,11 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
+import com.slowmac.autobackgroundremover.BackgroundRemover
+import com.slowmac.autobackgroundremover.OnBackgroundChangeListener
 import java.util.*
 
 @Composable
@@ -191,16 +195,46 @@ fun SingleClothItem(
 fun WardrobeNavigationSection(
     saveItem: (bitmap: Bitmap) -> Unit,
 ) {
+    var isAddItemDialogOpen by remember { mutableStateOf(false) }
+    var originalPhoto: Bitmap? by remember { mutableStateOf(null) }
+    var noBgPhoto: Bitmap? by remember { mutableStateOf(null) }
+
     val contentResolver = LocalContext.current.contentResolver
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
-            val bitmap = getBitmap(contentResolver, uri)
-            if (bitmap != null) {
-                saveItem(bitmap)
+            val galleryPhoto = getBitmap(contentResolver, uri)
+            if (galleryPhoto != null) {
+                originalPhoto = galleryPhoto
+
+                BackgroundRemover.bitmapForProcessing(
+                    galleryPhoto,
+                    false,
+                    object: OnBackgroundChangeListener {
+                        override fun onSuccess(bitmap: Bitmap) {
+                            noBgPhoto = bitmap
+                        }
+
+                        override fun onFailed(exception: Exception) {
+                            exception.printStackTrace()
+                        }
+                    }
+                )
+
+                isAddItemDialogOpen = true
             }
         }
     )
+
+    if (isAddItemDialogOpen) {
+        AddItemDialog(
+            onDismiss = { isAddItemDialogOpen = false },
+            originalPhoto = originalPhoto,
+            noBgPhoto = noBgPhoto,
+            saveItem = saveItem
+        )
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -215,6 +249,51 @@ fun WardrobeNavigationSection(
     }
 }
 
+@Composable
+fun AddItemDialog(
+    onDismiss: () -> Unit,
+    originalPhoto: Bitmap?,
+    noBgPhoto: Bitmap?,
+    saveItem: (bitmap: Bitmap) -> Unit
+) {
+    Log.d("WardrobeScreen", (originalPhoto != null).toString() + " " + (noBgPhoto != null).toString())
+    
+    var showOriginal by remember { mutableStateOf(true) }
+    
+    Dialog(
+        onDismissRequest = onDismiss
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(0.95f)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (showOriginal && originalPhoto != null) {
+                    Image(bitmap = originalPhoto.asImageBitmap(), contentDescription = null)
+                }
+                else if (!showOriginal && noBgPhoto != null) {
+                    Image(bitmap = noBgPhoto.asImageBitmap(), contentDescription = null)
+                }
+                Row() {
+                    Button(onClick = { onDismiss }) {
+                        Text(text = "Cancel")
+                    }
+                    Button(onClick = { showOriginal = !showOriginal }) {
+                        Text(text = if (showOriginal) "Hide BG" else "Show BG")
+                    }
+                    Button(onClick = {
+                        saveItem(if (showOriginal) originalPhoto!! else noBgPhoto!!)
+                        onDismiss()
+                    }) {
+                        Text(text = "Save")
+                    }
+                }
+                
+            }
+        }
+    }
+}
 
 @Composable
 fun BottomBarSpace(

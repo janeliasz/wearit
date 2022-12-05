@@ -17,7 +17,7 @@ import com.example.wearit.ui.WardrobeScreen
 enum class WearItScreen() {
     Intro,
     Picker,
-    Wardrobe
+    Wardrobe,
 }
 
 @Preview
@@ -76,6 +76,7 @@ fun WearItApp() {
                 setActiveInactive = { viewModel.setItemActiveInactive(it) },
                 currentCategory = uiState.currentCategory,
             )
+
         }
     }
 }

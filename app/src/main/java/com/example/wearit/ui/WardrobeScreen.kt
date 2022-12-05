@@ -1,5 +1,6 @@
 package com.example.wearit.ui
 
+import VerifyTick
 import androidx.compose.foundation.*
 import android.content.ContentResolver
 import android.graphics.Bitmap
@@ -11,6 +12,9 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,12 +22,14 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.wearit.R
 import com.example.wearit.components.ButtonType
 import com.example.wearit.components.MasterButton
@@ -188,7 +194,8 @@ fun WardrobeListOfItemsFromCurrentCategory(
     ) {
     Box(
         Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(10.dp, 0.dp),
         contentAlignment = Alignment.TopCenter
 
     ) {
@@ -219,31 +226,64 @@ fun SingleClothItem(
 
     ) {
 
-    Column(
-        Modifier
-            .padding(3.dp)
-            .clickable { setActiveInactive(item) },
-        horizontalAlignment = Alignment.CenterHorizontally
 
+    val itemOpacity: Float by animateFloatAsState(
+        targetValue = if (item.isActive) 1f else 0.6f,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = LinearEasing,
+        )
+    )
+    val tickOpacity: Float by animateFloatAsState(
+        targetValue = if (item.isActive) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = LinearEasing,
+        )
+    )
+
+    Box(
+        contentAlignment = Alignment.Center
     ) {
 
-        Text(text = "${item.isActive}", textAlign = TextAlign.Center, modifier = Modifier
-            .padding(5.dp, 0.dp, 5.dp, 10.dp))
-        Image(
-            bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
-            contentDescription = item.name,
+        VerifyTick(
             modifier = Modifier
-                .size(100.dp)
-                .padding(5.dp, 10.dp, 5.dp, 0.dp)
+                .align(Alignment.TopEnd),
+            tickOpacity = tickOpacity,
+            size = 30.dp
         )
-        Text(
-            text = item.name, textAlign = TextAlign.Center, modifier = Modifier
-                .padding(5.dp, 0.dp, 5.dp, 10.dp)
 
-        )
+        Column(
+            Modifier
+                .padding(3.dp)
+                .clickable { setActiveInactive(item) }
+                .border(
+                    width = 5.dp,
+                    color = MaterialTheme.colors.primary.copy(alpha = itemOpacity),
+                    shape = RoundedCornerShape(50.dp)
+                )
+                .alpha(itemOpacity),
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+
+            ) {
+
+            Image(
+                bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
+                contentDescription = item.name,
+                modifier = Modifier
+                    .size(120.dp)
+                    .padding(5.dp, 10.dp, 5.dp, 0.dp)
+                    .alpha(itemOpacity)
+            )
+            Text(
+                text = item.name, textAlign = TextAlign.Center, modifier = Modifier
+                    .padding(5.dp, 0.dp, 5.dp, 10.dp)
+
+            )
+        }
     }
 }
-
 @Composable
 fun WardrobeNavigationSection(
     saveItem: (bitmap: Bitmap) -> Unit,

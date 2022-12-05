@@ -9,15 +9,19 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -35,6 +39,7 @@ fun WardrobeScreen(
     saveItem: (bitmap: Bitmap) -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
+    currentCategory: Category,
 ) {
 
     val listOfCategories = Category.values().asList()
@@ -48,7 +53,8 @@ fun WardrobeScreen(
                 itemsOfCurrentCategory = itemsOfCurrentCategory,
                 saveItem = saveItem,
                 getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
-                setActiveInactive = setActiveInactive
+                setActiveInactive = setActiveInactive,
+                currentCategory = currentCategory
             )
         },
         bottomBar = {
@@ -69,6 +75,8 @@ fun WardrobePageContent(
     saveItem: (bitmap: Bitmap) -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
+    currentCategory: Category
+
 ) {
     Box(modifier = Modifier.padding(innerPadding)) {
         Column() {
@@ -80,7 +88,8 @@ fun WardrobePageContent(
                 listOfCategories = listOfCategories,
                 itemsOfCurrentCategory = itemsOfCurrentCategory,
                 getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
-                setActiveInactive = setActiveInactive
+                setActiveInactive = setActiveInactive,
+                currentCategory = currentCategory,
             )
         }
     }
@@ -93,7 +102,9 @@ fun WardrobeClothesListSection(
     itemsOfCurrentCategory: List<Item>?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
-    ) {
+    currentCategory: Category
+
+) {
     Row(
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier.fillMaxWidth()
@@ -101,6 +112,7 @@ fun WardrobeClothesListSection(
         WardrobeListOfCategories(
             onCategoryChange = onCategoryChange,
             listOfCategories = listOfCategories,
+            currentCategory = currentCategory
         )
         WardrobeListOfItemsFromCurrentCategory(
             itemsOfCurrentCategory = itemsOfCurrentCategory,
@@ -114,17 +126,45 @@ fun WardrobeClothesListSection(
 fun WardrobeListOfCategories(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
+    currentCategory: Category,
 ) {
-    Column() {
-        Column {
-            LazyColumn {
-                items(listOfCategories) { category ->
-                    Button(onClick = { onCategoryChange(category) }) {
-                        Text(text = "Go to $category")
-                    }
+    val columnPadding = 7.dp
+    Column {
+
+
+
+        LazyColumn {
+
+            items(listOfCategories) { category ->
+
+                TextButton(
+                    modifier = Modifier
+                        .animateContentSize()
+                        .size(if (category == currentCategory) 80.dp else 60.dp)
+                        .clip(RoundedCornerShape(0.dp, 50.dp, 50.dp, 0.dp))
+                        .background(if (category == currentCategory) MaterialTheme.colors.surface else MaterialTheme.colors.onSurface)
+                        .border(
+                            width = 9.dp,
+                            color = MaterialTheme.colors.primary,
+                            shape = RoundedCornerShape(0.dp, 50.dp, 50.dp, 0.dp)
+                        ),
+
+                    onClick = { onCategoryChange(category) }
+                ) {
+                    Icon(
+                        painter = painterResource(id = category.icon),
+                        tint = MaterialTheme.colors.primary,
+                        contentDescription = "$category",
+                        modifier = Modifier
+                            .offset(x = (-4).dp)
+                            .padding(10.dp)
+                    )
                 }
             }
+
         }
+
+
     }
 }
 
@@ -134,7 +174,8 @@ fun WardrobeListOfItemsFromCurrentCategory(
     itemsOfCurrentCategory: List<Item>?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
-) {
+
+    ) {
     Box(
         Modifier
             .fillMaxWidth(),
@@ -165,7 +206,9 @@ fun SingleClothItem(
     item: Item,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
-) {
+
+    ) {
+
     Column(
         Modifier
             .padding(3.dp)
@@ -173,9 +216,9 @@ fun SingleClothItem(
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
+
         Text(text = "${item.isActive}", textAlign = TextAlign.Center, modifier = Modifier
             .padding(5.dp, 0.dp, 5.dp, 10.dp))
-
         Image(
             bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
             contentDescription = item.name,
@@ -238,7 +281,9 @@ fun WardrobeNavigationSection(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(100.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Button(onClick = { imagePicker.launch("image/*") }) {
             Text(text = "Add")
@@ -326,14 +371,18 @@ fun AddItemDialog(
 fun BottomBarSpace(
     goToPickerScreen: () -> Unit,
 ) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp),
-        contentAlignment = Alignment.Center
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Button(onClick = { goToPickerScreen() }) {
             Text(text = "DRAW")
+        }
+        Button(onClick = { /*TODO*/ }) {
+            Text(text = "FAVOURITES")
         }
     }
 }

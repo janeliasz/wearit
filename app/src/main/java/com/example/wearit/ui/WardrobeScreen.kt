@@ -7,7 +7,6 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -17,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -228,7 +228,7 @@ fun WardrobeNavigationSection(
 
     if (isAddItemDialogOpen) {
         AddItemDialog(
-            onDismiss = { isAddItemDialogOpen = false },
+            closeDialog = { isAddItemDialogOpen = false },
             originalPhoto = originalPhoto,
             noBgPhoto = noBgPhoto,
             saveItem = saveItem
@@ -251,41 +251,68 @@ fun WardrobeNavigationSection(
 
 @Composable
 fun AddItemDialog(
-    onDismiss: () -> Unit,
+    closeDialog: () -> Unit,
     originalPhoto: Bitmap?,
     noBgPhoto: Bitmap?,
     saveItem: (bitmap: Bitmap) -> Unit
 ) {
-    Log.d("WardrobeScreen", (originalPhoto != null).toString() + " " + (noBgPhoto != null).toString())
-    
     var showOriginal by remember { mutableStateOf(true) }
     
     Dialog(
-        onDismissRequest = onDismiss
+        onDismissRequest = closeDialog
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth(0.95f)
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (showOriginal && originalPhoto != null) {
-                    Image(bitmap = originalPhoto.asImageBitmap(), contentDescription = null)
+                    Image(
+                        bitmap = originalPhoto.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .fillMaxWidth(),
+                        contentScale = ContentScale.FillWidth
+                    )
                 }
                 else if (!showOriginal && noBgPhoto != null) {
-                    Image(bitmap = noBgPhoto.asImageBitmap(), contentDescription = null)
+                    Image(
+                        bitmap = noBgPhoto.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .fillMaxWidth(),
+                        contentScale = ContentScale.FillWidth
+                    )
                 }
-                Row() {
-                    Button(onClick = { onDismiss }) {
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp, 0.dp, 20.dp, 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(onClick = closeDialog) {
                         Text(text = "Cancel")
                     }
-                    Button(onClick = { showOriginal = !showOriginal }) {
+
+                    Button(
+                        onClick = { showOriginal = !showOriginal },
+                        enabled = noBgPhoto != null
+                    ) {
                         Text(text = if (showOriginal) "Hide BG" else "Show BG")
                     }
-                    Button(onClick = {
-                        saveItem(if (showOriginal) originalPhoto!! else noBgPhoto!!)
-                        onDismiss()
-                    }) {
+
+                    Button(
+                        onClick = {
+                            saveItem(if (showOriginal) originalPhoto!! else noBgPhoto!!)
+                            closeDialog()
+                        },
+                        enabled = showOriginal && originalPhoto != null || !showOriginal && noBgPhoto != null
+                    ) {
                         Text(text = "Save")
                     }
                 }

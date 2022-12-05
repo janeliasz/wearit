@@ -27,13 +27,11 @@ fun MasterButton(
     modifier: Modifier,
     icon: Int?,
     text: String,
-    width: Dp,
 
 
     ) {
     Button(
         modifier = Modifier
-            .width(width)
             .then(modifier)
             .border(
                 width = 5.dp,

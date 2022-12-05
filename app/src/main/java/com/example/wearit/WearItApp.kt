@@ -18,7 +18,6 @@ enum class WearItScreen() {
     Intro,
     Picker,
     Wardrobe,
-    Settings
 }
 
 @Preview
@@ -75,8 +74,6 @@ fun WearItApp() {
                     )!!
                 },
                 setActiveInactive = { viewModel.setItemActiveInactive(it) },
-                goToSettings = { navController.navigate(WearItScreen.Settings.name) },
-
                 )
         }
     }

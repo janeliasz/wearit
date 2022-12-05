@@ -35,7 +35,6 @@ fun WardrobeScreen(
     saveItem: (bitmap: Bitmap) -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
-    goToSettings: () -> Unit,
 
     ) {
 
@@ -51,7 +50,6 @@ fun WardrobeScreen(
                 saveItem = saveItem,
                 getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
                 setActiveInactive = setActiveInactive,
-                goToSettings = goToSettings
             )
         },
         bottomBar = {
@@ -72,14 +70,12 @@ fun WardrobePageContent(
     saveItem: (bitmap: Bitmap) -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
-    goToSettings: () -> Unit,
 
     ) {
     Box(modifier = Modifier.padding(innerPadding)) {
         Column() {
             WardrobeNavigationSection(
                 saveItem = saveItem,
-                goToSettings = goToSettings
             )
 
             Divider(
@@ -209,7 +205,6 @@ fun SingleClothItem(
 @Composable
 fun WardrobeNavigationSection(
     saveItem: (bitmap: Bitmap) -> Unit,
-    goToSettings: () -> Unit,
 
 
     ) {
@@ -224,15 +219,6 @@ fun WardrobeNavigationSection(
         }
     )
     Box(){
-        Icon(painterResource(
-            id = R.drawable.settings),
-            contentDescription = "settings",
-            modifier = Modifier
-                .size(30.dp)
-                .align(Alignment.TopEnd)
-                .padding(0.dp, 5.dp, 5 .dp, 0.dp)
-                .clickable { goToSettings() }
-        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -244,19 +230,23 @@ fun WardrobeNavigationSection(
             MasterButton(
                 type = ButtonType.RED,
                 onClick = { imagePicker.launch("image/*") },
-                modifier = Modifier,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(10.dp),
                 icon = R.drawable.camera,
                 text = "ADD",
-                width = 180.dp
             )
 
             MasterButton(
                 type = ButtonType.WHITE,
                 onClick = { /*todo*/ },
-                modifier = Modifier,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(10.dp),
                 icon = R.drawable.editing,
                 text = "EDIT",
-                width = 180.dp
             )
         }
     }
@@ -277,19 +267,23 @@ fun BottomBarSpace(
         MasterButton(
             type = ButtonType.RED,
             onClick = goToPickerScreen,
-            modifier = Modifier,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(10.dp),
             icon = R.drawable.dice,
             text = "DRAW",
-            width = 180.dp
         )
 
         MasterButton(
             type = ButtonType.WHITE,
             onClick = { TODO() },
-            modifier = Modifier,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(10.dp),
             icon = null,
             text = "FAVOURITES",
-            width = 180.dp,
         )
     }
 }

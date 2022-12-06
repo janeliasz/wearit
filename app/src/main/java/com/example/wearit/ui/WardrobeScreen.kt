@@ -308,7 +308,7 @@ fun AddItemDialog(
     ) {
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.95f)
+                .fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -318,7 +318,7 @@ fun AddItemDialog(
                         bitmap = originalPhoto.asImageBitmap(),
                         contentDescription = null,
                         modifier = Modifier
-                            .padding(20.dp)
+                            .padding(12.dp, 12.dp, 12.dp, 0.dp)
                             .fillMaxWidth(),
                         contentScale = ContentScale.FillWidth
                     )
@@ -337,7 +337,7 @@ fun AddItemDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp, 0.dp, 20.dp, 10.dp),
+                        .padding(12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(onClick = closeDialog) {

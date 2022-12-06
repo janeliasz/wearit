@@ -348,7 +348,7 @@ fun AddItemDialog(
                         bitmap = originalPhoto.asImageBitmap(),
                         contentDescription = null,
                         modifier = Modifier
-                            .padding(12.dp, 12.dp, 12.dp, 0.dp)
+                            .padding(20.dp, 20.dp, 20.dp, 0.dp)
                             .fillMaxWidth(),
                         contentScale = ContentScale.FillWidth
                     )
@@ -367,29 +367,34 @@ fun AddItemDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(12.dp),
+                        .padding(20.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Button(onClick = closeDialog) {
-                        Text(text = "Cancel")
-                    }
-
-                    Button(
+                    MasterButton(
+                        type = ButtonType.RED,
+                        onClick = closeDialog,
+                        text = "Cancel",
+                        icon = null,
+                        modifier = Modifier
+                    )
+                    MasterButton(
+                        type = ButtonType.WHITE,
                         onClick = { showOriginal = !showOriginal },
-                        enabled = noBgPhoto != null
-                    ) {
-                        Text(text = if (showOriginal) "Hide BG" else "Show BG")
-                    }
+                        text = if (showOriginal) "Hide BG" else "Show BG",
+                        icon = null,
+                        modifier = Modifier
+                    )
 
-                    Button(
+                    MasterButton(
+                        type = ButtonType.RED,
                         onClick = {
                             saveItem(if (showOriginal) originalPhoto!! else noBgPhoto!!)
                             closeDialog()
                         },
-                        enabled = showOriginal && originalPhoto != null || !showOriginal && noBgPhoto != null
-                    ) {
-                        Text(text = "Save")
-                    }
+                        text = "Save",
+                        icon = null,
+                        modifier = Modifier
+                    )
                 }
                 
             }

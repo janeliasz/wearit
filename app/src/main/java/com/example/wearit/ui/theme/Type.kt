@@ -16,9 +16,14 @@ val fonts = FontFamily(
 // Set of Material typography styles to start with
 val Typography = Typography(
     body1 = TextStyle(
+        fontFamily = FontFamily.Serif,
+        fontWeight = FontWeight.Normal,
+        fontSize = 20.sp
+    ),
+    button = TextStyle(
         fontFamily = fonts,
         fontWeight = FontWeight.Bold,
-        fontSize = 30.sp
+        fontSize = 20.sp
     )
     /* Other default text styles to override
     button = TextStyle(

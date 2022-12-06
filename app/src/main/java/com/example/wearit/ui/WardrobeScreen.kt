@@ -25,6 +25,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.wearit.R
+import com.example.wearit.components.ButtonType
+import com.example.wearit.components.MasterButton
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
 import com.slowmac.autobackgroundremover.BackgroundRemover
@@ -41,6 +44,7 @@ fun WardrobeScreen(
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
 ) {
+
 
     val listOfCategories = Category.values().asList()
     Scaffold(
@@ -78,10 +82,19 @@ fun WardrobePageContent(
     currentCategory: Category
 
 ) {
+
     Box(modifier = Modifier.padding(innerPadding)) {
         Column() {
             WardrobeNavigationSection(
                 saveItem = saveItem,
+            )
+
+            Divider(
+                color = MaterialTheme.colors.primary,
+                thickness = 4.dp,
+                modifier = Modifier
+                    .padding(20.dp, 0.dp, 20.dp, 10.dp)
+                    .offset(y = -10.dp)
             )
             WardrobeClothesListSection(
                 onCategoryChange = onCategoryChange,
@@ -241,7 +254,6 @@ fun WardrobeNavigationSection(
     var isAddItemDialogOpen by remember { mutableStateOf(false) }
     var originalPhoto: Bitmap? by remember { mutableStateOf(null) }
     var noBgPhoto: Bitmap? by remember { mutableStateOf(null) }
-
     val contentResolver = LocalContext.current.contentResolver
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -278,18 +290,36 @@ fun WardrobeNavigationSection(
         )
     }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Button(onClick = { imagePicker.launch("image/*") }) {
-            Text(text = "Add")
-        }
-        Button(onClick = { /*TODO*/ }) {
-            Text(text = "EDIT")
+    Box(){
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+
+        ) {
+            MasterButton(
+                type = ButtonType.RED,
+                onClick = { imagePicker.launch("image/*") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(10.dp),
+                icon = R.drawable.camera,
+                text = "ADD",
+            )
+
+            MasterButton(
+                type = ButtonType.WHITE,
+                onClick = { /*todo*/ },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(10.dp),
+                icon = R.drawable.editing,
+                text = "EDIT",
+            )
         }
     }
 }
@@ -375,15 +405,32 @@ fun BottomBarSpace(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Button(onClick = { goToPickerScreen() }) {
-            Text(text = "DRAW")
-        }
-        Button(onClick = { /*TODO*/ }) {
-            Text(text = "FAVOURITES")
-        }
+        MasterButton(
+            type = ButtonType.RED,
+            onClick = goToPickerScreen,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(10.dp),
+            icon = R.drawable.dice,
+            text = "DRAW",
+        )
+
+        MasterButton(
+            type = ButtonType.WHITE,
+            onClick = { TODO() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(10.dp),
+            icon = null,
+            text = "FAVOURITES",
+        )
+
     }
 }
 

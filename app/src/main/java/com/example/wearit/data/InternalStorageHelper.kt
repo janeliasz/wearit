@@ -9,9 +9,10 @@ import java.util.UUID
 class InternalStorageHelper(private val context: Context) {
     fun savePhoto(bitmap: Bitmap): String {
         return try {
-            val filename = UUID.randomUUID().toString() + ".jpg"
+            val filename = UUID.randomUUID().toString() + ".png"
             context.openFileOutput(filename, Context.MODE_PRIVATE).use { stream ->
-                if(!bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)) {
+                bitmap.setHasAlpha(true)
+                if(!bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)) {
                     throw IOException("Could not save photo.")
                 }
             }
@@ -26,7 +27,7 @@ class InternalStorageHelper(private val context: Context) {
         val photosMap: MutableMap<String, Bitmap> = mutableMapOf()
 
         val files = context.filesDir.listFiles()
-        files.filter { it.canRead() && it.isFile && it.name.endsWith(".jpg")}.forEach() {
+        files.filter { it.canRead() && it.isFile && it.name.endsWith(".png")}.forEach() {
             val bytes = it.readBytes()
             val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
             photosMap[it.name] = bitmap

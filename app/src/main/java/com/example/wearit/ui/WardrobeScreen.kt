@@ -43,6 +43,7 @@ fun WardrobeScreen(
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
+    goToFavorites:() -> Unit,
 ) {
 
 
@@ -63,7 +64,8 @@ fun WardrobeScreen(
         },
         bottomBar = {
             BottomBarSpace(
-                goToPickerScreen = goToPickerScreen
+                goToPickerScreen = goToPickerScreen,
+                goToFavorites = goToFavorites
 
             )
         }
@@ -405,6 +407,7 @@ fun AddItemDialog(
 @Composable
 fun BottomBarSpace(
     goToPickerScreen: () -> Unit,
+    goToFavorites:() -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -427,13 +430,13 @@ fun BottomBarSpace(
 
         MasterButton(
             type = ButtonType.WHITE,
-            onClick = { TODO() },
+            onClick = goToFavorites,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
                 .padding(10.dp),
             icon = null,
-            text = "FAVOURITES",
+            text = "Favorites",
         )
 
     }

@@ -2,11 +2,13 @@ package com.example.wearit.ui
 
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -54,22 +56,28 @@ fun FavoritesContent(
     getItemById:(Int)-> Item?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
 ){
-    Text(text = "Im here")
     LazyColumn(
-
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(horizontal = 50.dp, vertical = 100.dp),
+        verticalArrangement = Arrangement.spacedBy(50.dp),
     ){
-        items(outfits){ outfit ->
+        itemsIndexed(outfits){ index,outfit ->
             LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 24.dp, end = 24.dp)
 
             ){
-
+                item{
+                    Text(text = index.toString())
+                }
                 items(outfit.itemsInOutfit){item->
                     val finalItem = getItemById(item)
 
                         Image(
                             bitmap = getItemPhotoByPhotoFilename(finalItem!!.photoFilename).asImageBitmap(),
                             contentDescription = finalItem.name,
-                            modifier = Modifier.size(100.dp)
+                            modifier = Modifier.size(width = 200.dp, height = 340.dp)
                         )
 
                 }

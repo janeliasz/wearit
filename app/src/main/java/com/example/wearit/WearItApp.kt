@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
 import com.example.wearit.data.AppViewModel
 import com.example.wearit.ui.FavoritesScreen
 import com.example.wearit.ui.PickerScreen
@@ -86,6 +87,13 @@ fun WearItApp() {
             FavoritesScreen(
                 goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
                 goToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
+                outfits = outfits,
+                getItemById = {viewModel.getItemById(it)  },
+                getItemPhotoByPhotoFilename = { itemId ->
+                    viewModel.getItemPhotoByPhotoFilename(
+                        itemId
+                    )!!
+                }
             )
         }
 

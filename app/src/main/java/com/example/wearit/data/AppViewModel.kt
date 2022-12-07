@@ -61,24 +61,28 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun changeSelectedItem(category: Category, next: Boolean) {
         val itemList: List<Item> = getAllItems.value
-        val itemMap: Map<Category, List<Item>> = getItemMap(itemList)
 
-        val newCurrentSelection = _uiState.value.currentSelection.map { itemId ->
-            val item = getItemById(itemId) ?: return
+        val newCurrentSelection = _uiState.value.currentSelection.mapNotNull { itemId ->
+            val item = getItemById(itemId) ?: return@mapNotNull null
 
             if (item.category != category)
                 itemId
             else {
-                val allItemsInCurrentItemCategory = itemMap.getValue(category)
-                val currentItemIndex = allItemsInCurrentItemCategory.indexOf(item)
+                val activeItemListWithCurrentItem = itemList
+                    .filter { (it.category == category && it.isActive) || it.id == itemId}
+
+                val currentItemIndex = activeItemListWithCurrentItem.indexOf(item)
                 var newCurrentItemIndex = currentItemIndex + if (next) 1 else -1
 
-                if (newCurrentItemIndex == allItemsInCurrentItemCategory.size)
+                if (newCurrentItemIndex == activeItemListWithCurrentItem.size)
                     newCurrentItemIndex = 0
                 else if (newCurrentItemIndex < 0)
-                    newCurrentItemIndex = allItemsInCurrentItemCategory.size - 1
+                    newCurrentItemIndex = activeItemListWithCurrentItem.size - 1
 
-                allItemsInCurrentItemCategory[newCurrentItemIndex].id
+                if (activeItemListWithCurrentItem[newCurrentItemIndex].isActive)
+                    activeItemListWithCurrentItem[newCurrentItemIndex].id
+                else
+                    null
             }
         }
 

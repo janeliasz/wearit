@@ -8,7 +8,6 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
@@ -25,16 +24,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
+import androidx.compose.ui.window.Dialog
 import com.example.wearit.R
 import com.example.wearit.components.ButtonType
 import com.example.wearit.components.MasterButton
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
+import com.slowmac.autobackgroundremover.BackgroundRemover
+import com.slowmac.autobackgroundremover.OnBackgroundChangeListener
 import java.util.*
 
 @Composable
@@ -287,19 +289,45 @@ fun SingleClothItem(
 @Composable
 fun WardrobeNavigationSection(
     saveItem: (bitmap: Bitmap) -> Unit,
-
-
-    ) {
+) {
+    var isAddItemDialogOpen by remember { mutableStateOf(false) }
+    var originalPhoto: Bitmap? by remember { mutableStateOf(null) }
+    var noBgPhoto: Bitmap? by remember { mutableStateOf(null) }
     val contentResolver = LocalContext.current.contentResolver
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
-            val bitmap = getBitmap(contentResolver, uri)
-            if (bitmap != null) {
-                saveItem(bitmap)
+            val galleryPhoto = getBitmap(contentResolver, uri)
+            if (galleryPhoto != null) {
+                originalPhoto = galleryPhoto
+
+                BackgroundRemover.bitmapForProcessing(
+                    galleryPhoto,
+                    false,
+                    object: OnBackgroundChangeListener {
+                        override fun onSuccess(bitmap: Bitmap) {
+                            noBgPhoto = bitmap
+                        }
+
+                        override fun onFailed(exception: Exception) {
+                            exception.printStackTrace()
+                        }
+                    }
+                )
+
+                isAddItemDialogOpen = true
             }
         }
     )
+
+    if (isAddItemDialogOpen) {
+        AddItemDialog(
+            closeDialog = { isAddItemDialogOpen = false },
+            originalPhoto = originalPhoto,
+            noBgPhoto = noBgPhoto,
+            saveItem = saveItem
+        )
+    }
 
     Box(){
         Row(
@@ -331,11 +359,87 @@ fun WardrobeNavigationSection(
                 icon = R.drawable.editing,
                 text = "EDIT",
             )
-
         }
     }
 }
 
+@Composable
+fun AddItemDialog(
+    closeDialog: () -> Unit,
+    originalPhoto: Bitmap?,
+    noBgPhoto: Bitmap?,
+    saveItem: (bitmap: Bitmap) -> Unit
+) {
+    var showOriginal by remember { mutableStateOf(true) }
+    
+    Dialog(
+        onDismissRequest = closeDialog
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (showOriginal && originalPhoto != null) {
+                    Image(
+                        bitmap = originalPhoto.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(20.dp, 20.dp, 20.dp, 0.dp)
+                            .fillMaxWidth(),
+                        contentScale = ContentScale.FillWidth
+                    )
+                }
+                else if (!showOriginal && noBgPhoto != null) {
+                    Image(
+                        bitmap = noBgPhoto.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .fillMaxWidth(),
+                        contentScale = ContentScale.FillWidth
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    MasterButton(
+                        type = ButtonType.RED,
+                        onClick = closeDialog,
+                        text = "Cancel",
+                        icon = null,
+                        modifier = Modifier
+                    )
+                    MasterButton(
+                        type = ButtonType.WHITE,
+                        onClick = { showOriginal = !showOriginal },
+                        text = if (showOriginal) "Hide BG" else "Show BG",
+                        icon = null,
+                        modifier = Modifier
+                    )
+
+                    MasterButton(
+                        type = ButtonType.RED,
+                        onClick = {
+                            saveItem(if (showOriginal) originalPhoto!! else noBgPhoto!!)
+                            closeDialog()
+                        },
+                        text = "Save",
+                        icon = null,
+                        modifier = Modifier
+                    )
+                }
+                
+            }
+        }
+    }
+}
 
 @Composable
 fun BottomBarSpace(

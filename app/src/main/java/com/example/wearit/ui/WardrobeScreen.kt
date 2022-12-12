@@ -245,7 +245,9 @@ fun SingleClothItem(
     )
 
     Box(
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .padding(0.dp,5.dp)
     ) {
 
         VerifyTick(
@@ -254,35 +256,37 @@ fun SingleClothItem(
             tickOpacity = tickOpacity,
             size = 30.dp
         )
+        Box(modifier = Modifier
+            .clip(shape = RoundedCornerShape(50.dp))
+        ) {
+            Column(
+                Modifier
+                    .clickable { setActiveInactive(item) }
+                    .border(
+                        width = 5.dp,
+                        color = MaterialTheme.colors.primary.copy(alpha = itemOpacity),
+                        shape = RoundedCornerShape(50.dp)
+                    )
+                    .alpha(itemOpacity),
+                horizontalAlignment = Alignment.CenterHorizontally,
 
-        Column(
-            Modifier
-                .padding(3.dp)
-                .clickable { setActiveInactive(item) }
-                .border(
-                    width = 5.dp,
-                    color = MaterialTheme.colors.primary.copy(alpha = itemOpacity),
-                    shape = RoundedCornerShape(50.dp)
+
+                ) {
+
+                Image(
+                    bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
+                    contentDescription = item.name,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(5.dp, 10.dp, 5.dp, 0.dp)
+                        .alpha(itemOpacity)
                 )
-                .alpha(itemOpacity),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                Text(
+                    text = item.name, textAlign = TextAlign.Center, modifier = Modifier
+                        .padding(5.dp, 0.dp, 5.dp, 10.dp)
 
-
-            ) {
-
-            Image(
-                bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
-                contentDescription = item.name,
-                modifier = Modifier
-                    .size(120.dp)
-                    .padding(5.dp, 10.dp, 5.dp, 0.dp)
-                    .alpha(itemOpacity)
-            )
-            Text(
-                text = item.name, textAlign = TextAlign.Center, modifier = Modifier
-                    .padding(5.dp, 0.dp, 5.dp, 10.dp)
-
-            )
+                )
+            }
         }
     }
 }

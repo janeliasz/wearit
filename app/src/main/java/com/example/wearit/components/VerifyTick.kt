@@ -30,14 +30,14 @@ fun VerifyTick(
     ) {
         Icon(
             painterResource(id = R.drawable.check),
-            contentDescription = "settings",
+            contentDescription = null,
             modifier = Modifier
                 .alpha(tickOpacity),
             tint = MaterialTheme.colors.primary,
         )
         Icon(
             painterResource(id = R.drawable.checkinside),
-            contentDescription = "settings",
+            contentDescription = null,
             modifier = Modifier
                 .size(0.6*size)
                 .alpha(tickOpacity),

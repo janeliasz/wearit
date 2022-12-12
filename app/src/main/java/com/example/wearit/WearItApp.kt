@@ -75,6 +75,7 @@ fun WearItApp() {
                 },
                 setActiveInactive = { viewModel.setItemActiveInactive(it) },
                 currentCategory = uiState.currentCategory,
+                deleteItem = { viewModel.deleteItem(it) }
             )
 
         }

@@ -1,6 +1,6 @@
 package com.example.wearit.ui
 
-import VerifyTick
+import ImageIcon
 import androidx.compose.foundation.*
 import android.content.ContentResolver
 import android.graphics.Bitmap
@@ -8,6 +8,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
@@ -48,7 +49,9 @@ fun WardrobeScreen(
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
-) {
+    deleteItem: (item: Item) -> Unit,
+
+    ) {
 
 
     val listOfCategories = Category.values().asList()
@@ -63,7 +66,8 @@ fun WardrobeScreen(
                 saveItem = saveItem,
                 getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
                 setActiveInactive = setActiveInactive,
-                currentCategory = currentCategory
+                currentCategory = currentCategory,
+                deleteItem = deleteItem
             )
         },
         bottomBar = {
@@ -84,14 +88,18 @@ fun WardrobePageContent(
     saveItem: (bitmap: Bitmap) -> Unit,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
-    currentCategory: Category
+    currentCategory: Category,
+    deleteItem: (item: Item) -> Unit,
 
-) {
+    ) {
+    var editing: Boolean by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.padding(innerPadding)) {
         Column() {
             WardrobeNavigationSection(
                 saveItem = saveItem,
+                editing = editing,
+                toggleEdit = {editing = !editing}
             )
 
             Divider(
@@ -108,7 +116,9 @@ fun WardrobePageContent(
                 getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
                 setActiveInactive = setActiveInactive,
                 currentCategory = currentCategory,
-            )
+                deleteItem = deleteItem,
+                editing = editing,
+                )
         }
     }
 }
@@ -120,9 +130,12 @@ fun WardrobeClothesListSection(
     itemsOfCurrentCategory: List<Item>?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
-    currentCategory: Category
+    currentCategory: Category,
+    deleteItem: (item: Item) -> Unit,
+    editing: Boolean,
 
-) {
+
+    ) {
     Row(
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier.fillMaxWidth()
@@ -135,8 +148,10 @@ fun WardrobeClothesListSection(
         WardrobeListOfItemsFromCurrentCategory(
             itemsOfCurrentCategory = itemsOfCurrentCategory,
             getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
-            setActiveInactive = setActiveInactive
-        )
+            setActiveInactive = setActiveInactive,
+            deleteItem = deleteItem,
+            editing = editing,
+            )
     }
 }
 
@@ -192,6 +207,8 @@ fun WardrobeListOfItemsFromCurrentCategory(
     itemsOfCurrentCategory: List<Item>?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
+    deleteItem: (item: Item) -> Unit,
+    editing: Boolean,
 
     ) {
     Box(
@@ -210,7 +227,9 @@ fun WardrobeListOfItemsFromCurrentCategory(
                     SingleClothItem(
                         item = item,
                         getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
-                        setActiveInactive = setActiveInactive
+                        setActiveInactive = setActiveInactive,
+                        deleteItem = deleteItem,
+                        editing = editing,
                     )
                 }
             }
@@ -225,24 +244,44 @@ fun SingleClothItem(
     item: Item,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     setActiveInactive: (item: Item) -> Unit,
+    deleteItem: (item: Item) -> Unit,
+    editing: Boolean,
 
     ) {
 
 
     val itemOpacity: Float by animateFloatAsState(
-        targetValue = if (item.isActive) 1f else 0.6f,
+        targetValue = if (item.isActive || editing) 1f else 0.6f,
         animationSpec = tween(
             durationMillis = 500,
             easing = LinearEasing,
         )
     )
     val tickOpacity: Float by animateFloatAsState(
-        targetValue = if (item.isActive) 1f else 0f,
+        targetValue = if (item.isActive && !editing) 1f else 0f,
         animationSpec = tween(
             durationMillis = 500,
             easing = LinearEasing,
         )
     )
+    val deleteOpacity: Float by animateFloatAsState(
+        targetValue = if (editing) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = LinearEasing,
+        )
+    )
+    var isDeleteItemDialogOpen by remember { mutableStateOf(false) }
+
+    if (isDeleteItemDialogOpen) {
+        DeleteItemDialog(
+            closeDialog = { isDeleteItemDialogOpen = false },
+            deleteItem = deleteItem,
+            item = item,
+        )
+    }
+
+
 
     Box(
         contentAlignment = Alignment.Center,
@@ -250,12 +289,24 @@ fun SingleClothItem(
             .padding(0.dp,5.dp)
     ) {
 
-        VerifyTick(
+        ImageIcon(
             modifier = Modifier
                 .align(Alignment.TopEnd),
             tickOpacity = tickOpacity,
-            size = 30.dp
+            size = 30.dp,
+            icon = R.drawable.checkinside,
+            onClick = {}
         )
+
+        ImageIcon(
+            modifier = Modifier
+                .align(Alignment.TopEnd),
+            tickOpacity = deleteOpacity,
+            size = 30.dp,
+            icon = R.drawable.close,
+            onClick = { if(editing) isDeleteItemDialogOpen = !isDeleteItemDialogOpen }//deleteItem(item) }
+        )
+
         Box(modifier = Modifier
             .clip(shape = RoundedCornerShape(50.dp))
         ) {
@@ -293,6 +344,8 @@ fun SingleClothItem(
 @Composable
 fun WardrobeNavigationSection(
     saveItem: (bitmap: Bitmap) -> Unit,
+    editing: Boolean,
+    toggleEdit: (editing: Boolean) -> Unit,
 ) {
     var isAddItemDialogOpen by remember { mutableStateOf(false) }
     var originalPhoto: Bitmap? by remember { mutableStateOf(null) }
@@ -333,6 +386,7 @@ fun WardrobeNavigationSection(
         )
     }
 
+
     Box(){
         Row(
             modifier = Modifier
@@ -355,13 +409,13 @@ fun WardrobeNavigationSection(
 
             MasterButton(
                 type = ButtonType.WHITE,
-                onClick = { /*todo*/ },
+                onClick = { toggleEdit(editing) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(10.dp),
                 icon = R.drawable.editing,
-                text = "EDIT",
+                text = if(!editing) "EDIT" else "DONE",
             )
         }
     }
@@ -444,6 +498,57 @@ fun AddItemDialog(
         }
     }
 }
+
+@Composable
+fun DeleteItemDialog(
+    closeDialog: () -> Unit,
+    deleteItem: (item: Item) -> Unit,
+    item: Item,
+) {
+    Dialog(
+        onDismissRequest = closeDialog
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+
+                horizontalAlignment = Alignment.CenterHorizontally
+
+            ) {
+                Text(text = "Do you want to delete?")
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    MasterButton(
+                        type = ButtonType.WHITE,
+                        onClick = closeDialog,
+                        text = "CANCEL",
+                        icon = null,
+                        modifier = Modifier
+                    )
+
+                    MasterButton(
+                        type = ButtonType.RED,
+                        onClick = { deleteItem(item) },
+                        text = "DELETE",
+                        icon = null,
+                        modifier = Modifier
+                    )
+                }
+            }
+
+        }
+    }
+}
+
 
 @Composable
 fun BottomBarSpace(

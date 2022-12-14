@@ -337,18 +337,16 @@ fun WardrobeNavigationSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp),
+                .height(120.dp)
+                .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             MasterButton(
-                type = ButtonType.RED,
                 onClick = { imagePicker.launch("image/*") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .padding(10.dp),
+                    .weight(1f),
                 icon = R.drawable.camera,
                 text = "ADD",
             )
@@ -358,8 +356,7 @@ fun WardrobeNavigationSection(
                 onClick = { /*todo*/ },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .padding(10.dp),
+                    .weight(1f),
                 icon = R.drawable.editing,
                 text = "EDIT",
             )
@@ -386,57 +383,40 @@ fun AddItemDialog(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (showOriginal && originalPhoto != null) {
-                    Image(
-                        bitmap = originalPhoto.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(20.dp, 20.dp, 20.dp, 0.dp)
-                            .fillMaxWidth(),
-                        contentScale = ContentScale.FillWidth
-                    )
-                }
-                else if (!showOriginal && noBgPhoto != null) {
-                    Image(
-                        bitmap = noBgPhoto.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(20.dp)
-                            .fillMaxWidth(),
-                        contentScale = ContentScale.FillWidth
-                    )
-                }
+                Image(
+                    bitmap = if (showOriginal) originalPhoto!!.asImageBitmap() else noBgPhoto!!.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(20.dp, 20.dp, 20.dp, 0.dp)
+                        .fillMaxWidth(),
+                    contentScale = ContentScale.FillWidth
+                )
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(30.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    MasterButton(
-                        type = ButtonType.RED,
-                        onClick = closeDialog,
-                        text = "Cancel",
-                        icon = null,
-                        modifier = Modifier
-                    )
                     MasterButton(
                         type = ButtonType.WHITE,
                         onClick = { showOriginal = !showOriginal },
-                        text = if (showOriginal) "Hide BG" else "Show BG",
-                        icon = null,
+                        icon = if (showOriginal) R.drawable.scissors else R.drawable.undo_arrow,
+                        enabled = noBgPhoto != null,
                         modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
                     )
 
                     MasterButton(
-                        type = ButtonType.RED,
                         onClick = {
                             saveItem(if (showOriginal) originalPhoto!! else noBgPhoto!!)
                             closeDialog()
                         },
-                        text = "Save",
-                        icon = null,
+                        icon = R.drawable.diskette,
                         modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
                     )
                 }
                 
@@ -452,18 +432,16 @@ fun BottomBarSpace(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(10.dp)
             .height(100.dp),
-
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         MasterButton(
-            type = ButtonType.RED,
             onClick = goToPickerScreen,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .padding(10.dp),
+                .weight(1f),
             icon = R.drawable.dice,
             text = "DRAW",
         )
@@ -473,9 +451,7 @@ fun BottomBarSpace(
             onClick = { TODO() },
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .padding(10.dp),
-            icon = null,
+                .weight(1f),
             text = "FAVOURITES",
         )
 

@@ -358,7 +358,7 @@ fun AddItemDialog(
                     MasterButton(
                         type = ButtonType.WHITE,
                         onClick = { showOriginal = !showOriginal },
-                        icon = R.drawable.ic_baseline_content_cut_24,
+                        icon = if (showOriginal) R.drawable.scissors else R.drawable.undo_arrow,
                         enabled = noBgPhoto != null,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -370,7 +370,7 @@ fun AddItemDialog(
                             saveItem(if (showOriginal) originalPhoto!! else noBgPhoto!!)
                             closeDialog()
                         },
-                        icon = R.drawable.ic_baseline_save_24,
+                        icon = R.drawable.diskette,
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)

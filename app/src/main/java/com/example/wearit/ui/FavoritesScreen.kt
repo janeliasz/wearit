@@ -68,31 +68,50 @@ fun FavoritesContent(
     getItemById: (Int) -> Item?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 50.dp, vertical = 100.dp),
-        verticalArrangement = Arrangement.spacedBy(50.dp),
-    ) {
-        items(outfits) { outfit ->
-            Box(
-                contentAlignment = Alignment.Center,
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.padding(top=30.dp, bottom = 20.dp, start = 35.dp, end = 35.dp)) {
+            MasterButton(
+                type = ButtonType.WHITE,
+                onClick = { /*todo*/ },
                 modifier = Modifier
-                    .padding(5.dp, 5.dp)
-                    .clip(shape = RoundedCornerShape(50.dp))
                     .fillMaxWidth()
-                    .border(
-                        width = 5.dp,
-                        color = MaterialTheme.colors.primary.copy(alpha = LocalContentAlpha.current),
-                        shape = RoundedCornerShape(50.dp)
-                    )
+                    .weight(1f),
+                icon = R.drawable.editing,
+                text = "EDIT",
+            )
+        }
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 35.dp, vertical = 100.dp),
+            verticalArrangement = Arrangement.spacedBy(50.dp),
+        ) {
+            items(outfits) { outfit ->
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .padding(5.dp, 5.dp)
+                        .clip(shape = RoundedCornerShape(50.dp))
+                        .fillMaxWidth()
+                        .border(
+                            width = 5.dp,
+                            color = MaterialTheme.colors.primary.copy(alpha = LocalContentAlpha.current),
+                            shape = RoundedCornerShape(50.dp)
+                        )
 
-            ) {
+                ) {
 
-                MakeHorizontalPager(outfit.itemsInOutfit, getItemById, getItemPhotoByPhotoFilename);
+                    MakeHorizontalPager(
+                        outfit.itemsInOutfit,
+                        getItemById,
+                        getItemPhotoByPhotoFilename
+                    );
 
+                }
             }
         }
+
     }
+
 
 }
 
@@ -117,7 +136,6 @@ fun MakeHorizontalPager(
             state = pagerState,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 24.dp, top = 10.dp, bottom = 5.dp, end = 24.dp)
         ) { currentPage ->
             Row {
                 val finalItem = getItemById(itemsInOutfit[currentPage])
@@ -125,7 +143,7 @@ fun MakeHorizontalPager(
                     bitmap = getItemPhotoByPhotoFilename(finalItem!!.photoFilename).asImageBitmap(),
                     contentDescription = finalItem.name,
                     modifier = Modifier
-                        .size(width = 150.dp, height = 250.dp)
+                        .size(width = 200.dp, height = 340.dp)
                 )
 
             }

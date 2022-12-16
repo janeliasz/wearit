@@ -454,8 +454,7 @@ fun BottomBarSpace(
             onClick = goToFavorites,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .padding(10.dp),
+                .weight(1f),
             icon = null,
             text = "Favorites",
         )

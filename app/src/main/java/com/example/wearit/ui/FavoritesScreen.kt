@@ -119,7 +119,7 @@ fun MakeHorizontalPager(
                 .fillMaxWidth()
                 .padding(start = 24.dp, top = 10.dp, bottom = 5.dp, end = 24.dp)
         ) { currentPage ->
-            Row() {
+            Row {
                 val finalItem = getItemById(itemsInOutfit[currentPage])
                 Image(
                     bitmap = getItemPhotoByPhotoFilename(finalItem!!.photoFilename).asImageBitmap(),
@@ -131,15 +131,19 @@ fun MakeHorizontalPager(
             }
 
         }
-        Box(contentAlignment=Alignment.BottomCenter, modifier = Modifier.fillMaxWidth().padding(start = 10.dp, bottom = 15.dp, end = 10.dp)){
-            PagerIndicator(pagerState = pagerState, indicatorCount = itemsInOutfit.size ) {
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp, bottom = 15.dp, end = 10.dp)
+        ) {
+            PagerIndicator(pagerState = pagerState, indicatorCount = itemsInOutfit.size) {
                 coroutineScope.launch {
                     pagerState.scrollToPage(it)
                 }
             }
         }
     }
-
 
 
 }
@@ -159,12 +163,10 @@ fun BottomBar(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             MasterButton(
-                type = ButtonType.RED,
                 onClick = goToPickerScreen,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .padding(10.dp),
+                    .weight(1f),
                 icon = R.drawable.dice,
                 text = "DRAW",
             )
@@ -174,8 +176,7 @@ fun BottomBar(
                 onClick = goToWardrobe,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .padding(10.dp),
+                    .weight(1f),
                 icon = null,
                 text = "Wardrobe",
             )
@@ -197,7 +198,6 @@ fun PagerIndicator(
     space: Dp = 8.dp,
     activeColor: Color = Color(0xffEC407A),
     inActiveColor: Color = Color.LightGray,
-    orientation: IndicatorOrientation = IndicatorOrientation.Horizontal,
     onClick: ((Int) -> Unit)? = null
 ) {
 
@@ -215,44 +215,25 @@ fun PagerIndicator(
     val itemCount = pagerState.pageCount
 
 
-    if (orientation == IndicatorOrientation.Horizontal) {
-        LazyRow(
-            modifier = modifier.width(totalWidth),
-            state = listState,
-            contentPadding = PaddingValues(vertical = space),
-            horizontalArrangement = Arrangement.spacedBy(space),
+    LazyRow(
+        modifier = modifier.width(totalWidth),
+        state = listState,
+        contentPadding = PaddingValues(vertical = space),
+        horizontalArrangement = Arrangement.spacedBy(space),
 
         ) {
-            indicatorItems(
-                itemCount,
-                currentItem,
-                indicatorCount,
-                indicatorShape,
-                activeColor,
-                inActiveColor,
-                indicatorSize,
-                onClick
-            )
-        }
-    } else {
-        LazyColumn(
-            modifier = modifier.height(totalWidth),
-            state = listState,
-            contentPadding = PaddingValues(horizontal = space),
-            verticalArrangement = Arrangement.spacedBy(space),
-        ) {
-            indicatorItems(
-                itemCount,
-                currentItem,
-                indicatorCount,
-                indicatorShape,
-                activeColor,
-                inActiveColor,
-                indicatorSize,
-                onClick
-            )
-        }
+        indicatorItems(
+            itemCount,
+            currentItem,
+            indicatorCount,
+            indicatorShape,
+            activeColor,
+            inActiveColor,
+            indicatorSize,
+            onClick
+        )
     }
+
 
 }
 
@@ -327,6 +308,3 @@ private fun LazyListScope.indicatorItems(
     }
 }
 
-enum class IndicatorOrientation {
-    Horizontal
-}

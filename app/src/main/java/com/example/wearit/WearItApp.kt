@@ -27,12 +27,13 @@ fun WearItApp() {
     val uiState by viewModel.uiState.collectAsState()
     val items by viewModel.getAllItems.collectAsState()
     val outfits by viewModel.getAllOutfits.collectAsState()
+    val isAppInDarkTheme by viewModel.getIsAppInDarkTheme.collectAsState()
 
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = WearItScreen.Intro.name
+        startDestination = WearItScreen.Picker.name
     ) {
         composable(WearItScreen.Intro.name) {
             IntroScreen(navigateToPicker = { navController.navigate(WearItScreen.Picker.name) })
@@ -58,7 +59,6 @@ fun WearItApp() {
                 },
                 drawSelection = {viewModel.drawItems()},
                 saveOutfit = {viewModel.saveOutfit()}
-
             )
         }
 

@@ -24,11 +24,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.wearit.R
@@ -345,7 +349,7 @@ fun SingleClothItem(
 fun WardrobeNavigationSection(
     saveItem: (bitmap: Bitmap) -> Unit,
     editing: Boolean,
-    toggleEdit: (editing: Boolean) -> Unit,
+    toggleEdit: () -> Unit,
 ) {
     var isAddItemDialogOpen by remember { mutableStateOf(false) }
     var originalPhoto: Bitmap? by remember { mutableStateOf(null) }
@@ -409,7 +413,7 @@ fun WardrobeNavigationSection(
 
             MasterButton(
                 type = ButtonType.WHITE,
-                onClick = { toggleEdit(editing) },
+                onClick = { toggleEdit() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -499,6 +503,7 @@ fun AddItemDialog(
     }
 }
 
+
 @Composable
 fun DeleteItemDialog(
     closeDialog: () -> Unit,
@@ -506,7 +511,7 @@ fun DeleteItemDialog(
     item: Item,
 ) {
     Dialog(
-        onDismissRequest = closeDialog
+        onDismissRequest = closeDialog,
     ) {
         Card(
             modifier = Modifier
@@ -515,17 +520,21 @@ fun DeleteItemDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(10.dp),
 
                 horizontalAlignment = Alignment.CenterHorizontally
 
             ) {
-                Text(text = "Do you want to delete?")
+                Text(text = "CONFIRM DELETE:",
+                    style = MaterialTheme.typography.caption,
+                    modifier = Modifier
+                        .padding(0.dp, 15.dp, 0.dp, 5.dp)
+                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(0.dp, 5.dp, 0.dp, 15.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     MasterButton(
                         type = ButtonType.WHITE,

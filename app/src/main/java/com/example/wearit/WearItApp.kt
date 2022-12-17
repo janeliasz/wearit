@@ -1,6 +1,7 @@
 package com.example.wearit
 
 import IntroScreen
+import SettingsScreen
 import android.app.Application
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
@@ -18,6 +19,7 @@ enum class WearItScreen() {
     Intro,
     Picker,
     Wardrobe,
+    Settings
 }
 
 @Preview
@@ -58,7 +60,8 @@ fun WearItApp() {
                     )
                 },
                 drawSelection = {viewModel.drawItems()},
-                saveOutfit = {viewModel.saveOutfit()}
+                saveOutfit = {viewModel.saveOutfit()},
+                goToSettings = { navController.navigate(WearItScreen.Settings.name) }
             )
         }
 
@@ -76,7 +79,14 @@ fun WearItApp() {
                 setActiveInactive = { viewModel.setItemActiveInactive(it) },
                 currentCategory = uiState.currentCategory,
             )
+        }
 
+        composable(WearItScreen.Settings.name) {
+            SettingsScreen(
+                isAppInDarkTheme = isAppInDarkTheme,
+                switchTheme = { darkMode -> viewModel.switchTheme(darkMode) },
+                goToPicker = { navController.navigate(WearItScreen.Picker.name) }
+            )
         }
     }
 }

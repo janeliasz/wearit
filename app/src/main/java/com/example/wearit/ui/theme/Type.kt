@@ -5,6 +5,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.wearit.R
 
@@ -16,7 +17,7 @@ val fonts = FontFamily(
 // Set of Material typography styles to start with
 val Typography = Typography(
     body1 = TextStyle(
-        fontFamily = FontFamily.Serif,
+        fontFamily = fonts,
         fontWeight = FontWeight.Normal,
         fontSize = 20.sp
     ),
@@ -24,6 +25,18 @@ val Typography = Typography(
         fontFamily = fonts,
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp
+    ),
+    h1 = TextStyle(
+        fontFamily = fonts,
+        fontWeight = FontWeight.Bold,
+        fontSize = 35.sp,
+        textAlign = TextAlign.Center
+    ),
+    h2 = TextStyle(
+        fontFamily = fonts,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        textAlign = TextAlign.Center
     )
     /* Other default text styles to override
     button = TextStyle(

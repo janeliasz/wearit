@@ -185,10 +185,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun switchTheme() {
+    fun switchTheme(darkMode: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            val isAppInDarkTheme = getIsAppInDarkTheme.value
-            dataStore.saveIsAppInDarkTheme(!isAppInDarkTheme)
+            dataStore.saveIsAppInDarkTheme(darkMode)
         }
     }
 }

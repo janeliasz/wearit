@@ -78,7 +78,11 @@ fun WearItApp() {
                 },
                 setActiveInactive = { viewModel.setItemActiveInactive(it) },
                 currentCategory = uiState.currentCategory,
-                goToFavorites = { navController.navigate(WearItScreen.Favorites.name)}
+
+                goToFavorites = { navController.navigate(WearItScreen.Favorites.name)},
+
+                deleteItem = { viewModel.deleteItem(it) }
+
             )
 
         }

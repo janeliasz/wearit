@@ -1,9 +1,9 @@
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.wearit.components.ButtonType
@@ -47,7 +47,7 @@ fun SettingsContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(40.dp),
+                .padding(top = 40.dp, bottom = 30.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -66,40 +66,52 @@ fun SettingsContent(
             )
         }
 
-        Text(
-            text = "ABOUT US",
-            style = MaterialTheme.typography.h2,
-            modifier = Modifier.fillMaxWidth(),
+        Divider(
+            color = MaterialTheme.colors.onBackground,
+            thickness = 4.dp,
         )
 
-        Text(
-            text = "This application was created during Mobile Applications On Android Platform university course.",
-            textAlign = TextAlign.Center
-        )
-        
-        Text(
-            text = "Creators:",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 50.dp),
-            textAlign = TextAlign.Center
-        )
-        
-        Text(
-            text = "Jan Eliasz",
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = "Michał Sternik",
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = "Kamil Krawiec",
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            Text(
+                text = "ABOUT US",
+                style = MaterialTheme.typography.h2,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Text(
+                text = "This application was created during Mobile Applications On Android Platform university course.",
+                textAlign = TextAlign.Center
+            )
+
+            Text(
+                text = "Creators:",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 50.dp),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = "Jan Eliasz",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "Michał Sternik",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "Kamil Krawiec",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
@@ -107,19 +119,25 @@ fun SettingsContent(
 fun SettingsBottomBar(
     goToPicker: () -> Unit
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .padding(10.dp)
             .height(100.dp)
             .fillMaxWidth(),
 
         ) {
+        Divider(
+            color = MaterialTheme.colors.onBackground,
+            thickness = 4.dp,
+            modifier = Modifier
+                .padding(start = 10.dp, end = 10.dp, bottom = 20.dp)
+        )
+
         MasterButton(
             type = ButtonType.WHITE,
             onClick = goToPicker,
             text = "BACK",
             modifier = Modifier
-                .align(alignment = Alignment.Center)
                 .fillMaxWidth()
         )
     }

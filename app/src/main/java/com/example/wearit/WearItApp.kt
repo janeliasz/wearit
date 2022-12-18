@@ -1,7 +1,9 @@
 package com.example.wearit
 
 import IntroScreen
+import ItemInfo
 import android.app.Application
+import androidx.compose.material.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.wearit.data.AppViewModel
 import com.example.wearit.ui.PickerScreen
 import com.example.wearit.ui.WardrobeScreen
@@ -18,6 +22,7 @@ enum class WearItScreen() {
     Intro,
     Picker,
     Wardrobe,
+    ItemInfo
 }
 
 @Preview
@@ -56,8 +61,8 @@ fun WearItApp() {
                         next
                     )
                 },
-                drawSelection = {viewModel.drawItems()},
-                saveOutfit = {viewModel.saveOutfit()}
+                drawSelection = { viewModel.drawItems() },
+                saveOutfit = { viewModel.saveOutfit() }
 
             )
         }
@@ -75,9 +80,28 @@ fun WearItApp() {
                 },
                 setActiveInactive = { viewModel.setItemActiveInactive(it) },
                 currentCategory = uiState.currentCategory,
-                deleteItem = { viewModel.deleteItem(it) }
+                deleteItem = { viewModel.deleteItem(it) },
+                navController = navController,
             )
 
+        }
+        composable(
+            route = "profile/{itemId}",
+            arguments = listOf(navArgument("itemId") { type = NavType.StringType })
+        ) {
+            backStackEntry ->
+//            val id = it.arguments?.getString("itemId")
+//            Text("dynamic route, received argument: $id")
+            ItemInfo(
+                navController = navController,
+                itemId = backStackEntry.arguments?.getString("itemId")!!,
+                getItemPhotoByPhotoFilename = { itemId ->
+                    viewModel.getItemPhotoByPhotoFilename(
+                        viewModel.getItemById(itemId.toInt())!!.photoFilename
+//                        (backStackEntry.arguments?.getString("itemId")!!)
+                    )!!
+                },
+            )
         }
     }
 }

@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavHostController
 import com.example.wearit.R
 import com.example.wearit.components.ButtonType
 import com.example.wearit.components.MasterButton
@@ -54,6 +55,8 @@ fun WardrobeScreen(
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
+    navController: NavHostController,
+
 
     ) {
 
@@ -71,7 +74,8 @@ fun WardrobeScreen(
                 getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
                 setActiveInactive = setActiveInactive,
                 currentCategory = currentCategory,
-                deleteItem = deleteItem
+                deleteItem = deleteItem,
+                navController = navController
             )
         },
         bottomBar = {
@@ -94,6 +98,7 @@ fun WardrobePageContent(
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
+    navController: NavHostController
 
     ) {
     var editing: Boolean by remember { mutableStateOf(false) }
@@ -122,7 +127,8 @@ fun WardrobePageContent(
                 currentCategory = currentCategory,
                 deleteItem = deleteItem,
                 editing = editing,
-                )
+                navController = navController,
+            )
         }
     }
 }
@@ -137,6 +143,8 @@ fun WardrobeClothesListSection(
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
+    navController: NavHostController
+
 
 
     ) {
@@ -155,7 +163,8 @@ fun WardrobeClothesListSection(
             setActiveInactive = setActiveInactive,
             deleteItem = deleteItem,
             editing = editing,
-            )
+            navController = navController,
+        )
     }
 }
 
@@ -213,6 +222,8 @@ fun WardrobeListOfItemsFromCurrentCategory(
     setActiveInactive: (item: Item) -> Unit,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
+    navController: NavHostController
+
 
     ) {
     Box(
@@ -234,6 +245,8 @@ fun WardrobeListOfItemsFromCurrentCategory(
                         setActiveInactive = setActiveInactive,
                         deleteItem = deleteItem,
                         editing = editing,
+                        navController = navController,
+
                     )
                 }
             }
@@ -243,6 +256,7 @@ fun WardrobeListOfItemsFromCurrentCategory(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SingleClothItem(
     item: Item,
@@ -250,6 +264,7 @@ fun SingleClothItem(
     setActiveInactive: (item: Item) -> Unit,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
+    navController: NavHostController
 
     ) {
 
@@ -316,7 +331,13 @@ fun SingleClothItem(
         ) {
             Column(
                 Modifier
-                    .clickable { setActiveInactive(item) }
+                    .combinedClickable (
+                        onClick = {
+                            setActiveInactive(item)
+                        },
+                        onLongClick = {
+                            navController.navigate("profile/${item.id}" )                        },
+                    )
                     .border(
                         width = 5.dp,
                         color = MaterialTheme.colors.primary.copy(alpha = itemOpacity),

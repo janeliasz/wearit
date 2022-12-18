@@ -68,21 +68,20 @@ fun FavoritesContent(
     getItemById: (Int) -> Item?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(modifier = Modifier.padding(top=30.dp, bottom = 20.dp, start = 35.dp, end = 35.dp)) {
+    Column(modifier = Modifier.fillMaxWidth().padding(bottom = 75.dp)) {
+        Box(modifier = Modifier.padding(top=30.dp, bottom = 20.dp, start = 35.dp, end = 35.dp)) {
             MasterButton(
                 type = ButtonType.WHITE,
                 onClick = { /*todo*/ },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+                    .fillMaxWidth(),
                 icon = R.drawable.editing,
                 text = "EDIT",
             )
         }
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 35.dp, vertical = 100.dp),
+            contentPadding = PaddingValues(horizontal = 35.dp, vertical = 50.dp),
             verticalArrangement = Arrangement.spacedBy(50.dp),
         ) {
             items(outfits) { outfit ->
@@ -137,16 +136,17 @@ fun MakeHorizontalPager(
             modifier = Modifier
                 .fillMaxWidth()
         ) { currentPage ->
-            Row {
-                val finalItem = getItemById(itemsInOutfit[currentPage])
-                Image(
-                    bitmap = getItemPhotoByPhotoFilename(finalItem!!.photoFilename).asImageBitmap(),
-                    contentDescription = finalItem.name,
-                    modifier = Modifier
-                        .size(width = 200.dp, height = 340.dp)
-                )
 
-            }
+                val finalItem = getItemById(itemsInOutfit[currentPage])
+
+                if(finalItem!=null){
+                    Image(
+                        bitmap = getItemPhotoByPhotoFilename(finalItem.photoFilename).asImageBitmap(),
+                        contentDescription = finalItem.name,
+                        modifier = Modifier
+                            .size(width = 200.dp, height = 340.dp).padding(bottom = 5.dp,top=5.dp)
+                    )
+                }
 
         }
         Box(
@@ -171,14 +171,13 @@ fun BottomBar(
     goToPickerScreen: () -> Unit,
     goToWardrobe: () -> Unit,
 ) {
-    Column(modifier = Modifier.background(color = Color.White)) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth().background(color = MaterialTheme.colors.background)
+                .padding(10.dp)
                 .height(100.dp),
-
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             MasterButton(
                 onClick = goToPickerScreen,
@@ -200,7 +199,7 @@ fun BottomBar(
             )
 
         }
-    }
+
 
 }
 
@@ -222,7 +221,6 @@ fun PagerIndicator(
     val listState = rememberLazyListState()
 
     val totalWidth: Dp = indicatorSize * indicatorCount + space * (indicatorCount - 1)
-    val widthInPx = LocalDensity.current.run { indicatorSize.toPx() }
 
     val currentItem by remember {
         derivedStateOf {

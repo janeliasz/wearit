@@ -90,15 +90,14 @@ fun WearItApp() {
             arguments = listOf(navArgument("itemId") { type = NavType.StringType })
         ) {
             backStackEntry ->
-//            val id = it.arguments?.getString("itemId")
-//            Text("dynamic route, received argument: $id")
             ItemInfo(
                 navController = navController,
                 itemId = backStackEntry.arguments?.getString("itemId")!!,
+                getItemById = { itemId -> viewModel.getItemById(itemId.toInt())!! },
+                deleteItem = { viewModel.deleteItem(it) },
                 getItemPhotoByPhotoFilename = { itemId ->
                     viewModel.getItemPhotoByPhotoFilename(
-                        viewModel.getItemById(itemId.toInt())!!.photoFilename
-//                        (backStackEntry.arguments?.getString("itemId")!!)
+                        itemId
                     )!!
                 },
             )

@@ -81,17 +81,17 @@ fun WearItApp() {
                 setActiveInactive = { viewModel.setItemActiveInactive(it) },
                 currentCategory = uiState.currentCategory,
                 deleteItem = { viewModel.deleteItem(it) },
-                navController = navController,
+                goToSingleItem = { itemId -> navController.navigate(WearItScreen.ItemInfo.name+"/${itemId}")}
             )
 
         }
         composable(
-            route = "profile/{itemId}",
+            route = "${WearItScreen.ItemInfo.name}/{itemId}",
             arguments = listOf(navArgument("itemId") { type = NavType.StringType })
         ) {
             backStackEntry ->
             ItemInfo(
-                navController = navController,
+                returnToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
                 itemId = backStackEntry.arguments?.getString("itemId")!!,
                 getItemById = { itemId -> viewModel.getItemById(itemId.toInt())!! },
                 deleteItem = { viewModel.deleteItem(it) },

@@ -55,7 +55,7 @@ fun WardrobeScreen(
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
-    navController: NavHostController,
+    goToSingleItem: (itemId: Int) -> Unit
 
 
     ) {
@@ -75,7 +75,7 @@ fun WardrobeScreen(
                 setActiveInactive = setActiveInactive,
                 currentCategory = currentCategory,
                 deleteItem = deleteItem,
-                navController = navController
+                goToSingleItem = goToSingleItem
             )
         },
         bottomBar = {
@@ -98,7 +98,7 @@ fun WardrobePageContent(
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
-    navController: NavHostController
+    goToSingleItem: (itemId: Int) -> Unit
 
     ) {
     var editing: Boolean by remember { mutableStateOf(false) }
@@ -127,7 +127,7 @@ fun WardrobePageContent(
                 currentCategory = currentCategory,
                 deleteItem = deleteItem,
                 editing = editing,
-                navController = navController,
+                goToSingleItem = goToSingleItem,
             )
         }
     }
@@ -143,7 +143,7 @@ fun WardrobeClothesListSection(
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
-    navController: NavHostController
+    goToSingleItem: (itemId: Int) -> Unit
 
 
 
@@ -163,7 +163,7 @@ fun WardrobeClothesListSection(
             setActiveInactive = setActiveInactive,
             deleteItem = deleteItem,
             editing = editing,
-            navController = navController,
+            goToSingleItem = goToSingleItem,
         )
     }
 }
@@ -222,7 +222,7 @@ fun WardrobeListOfItemsFromCurrentCategory(
     setActiveInactive: (item: Item) -> Unit,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
-    navController: NavHostController
+    goToSingleItem: (itemId: Int) -> Unit
 
 
     ) {
@@ -245,7 +245,7 @@ fun WardrobeListOfItemsFromCurrentCategory(
                         setActiveInactive = setActiveInactive,
                         deleteItem = deleteItem,
                         editing = editing,
-                        navController = navController,
+                        goToSingleItem = goToSingleItem,
 
                     )
                 }
@@ -264,7 +264,7 @@ fun SingleClothItem(
     setActiveInactive: (item: Item) -> Unit,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
-    navController: NavHostController
+    goToSingleItem: (itemId: Int) -> Unit
 
     ) {
 
@@ -327,16 +327,18 @@ fun SingleClothItem(
         )
 
         Box(modifier = Modifier
-            .clip(shape = RoundedCornerShape(50.dp))
+            .clip(shape = RoundedCornerShape(50.dp)),
         ) {
             Column(
                 Modifier
+                    .height(150.dp)
                     .combinedClickable (
                         onClick = {
                             setActiveInactive(item)
                         },
                         onLongClick = {
-                            navController.navigate("profile/${item.id}" )                        },
+                            goToSingleItem(item.id)
+                        },
                     )
                     .border(
                         width = 5.dp,
@@ -345,6 +347,7 @@ fun SingleClothItem(
                     )
                     .alpha(itemOpacity),
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
 
 
                 ) {
@@ -354,14 +357,13 @@ fun SingleClothItem(
                     contentDescription = item.name,
                     modifier = Modifier
                         .size(120.dp)
-                        .padding(5.dp, 10.dp, 5.dp, 0.dp)
                         .alpha(itemOpacity)
                 )
-                Text(
-                    text = item.name, textAlign = TextAlign.Center, modifier = Modifier
-                        .padding(5.dp, 0.dp, 5.dp, 10.dp)
-
-                )
+//                Text(
+//                    text = item.name, textAlign = TextAlign.Center, modifier = Modifier
+//                        .padding(5.dp, 0.dp, 5.dp, 10.dp)
+//
+//                )
             }
         }
     }

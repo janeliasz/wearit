@@ -32,7 +32,7 @@ import kotlin.math.sin
 
 @Composable
 fun ItemInfo(
-    navController: NavHostController,
+    returnToWardrobe: () -> Unit,
     itemId: String,
     getItemById: (itemId: String) -> Item,
     deleteItem: (item: Item) -> Unit,
@@ -54,7 +54,7 @@ fun ItemInfo(
         },
         bottomBar = {
             BottomBarSpace(
-                navController = navController,
+                returnToWardrobe = returnToWardrobe,
                 currItem = currItem,
                 deleteItem = deleteItem
             )
@@ -98,7 +98,7 @@ fun ItemInfoContent(
 
 @Composable
 fun BottomBarSpace(
-    navController: NavHostController,
+    returnToWardrobe: () -> Unit,
     currItem: Item,
     deleteItem: (item: Item) -> Unit,
 
@@ -116,7 +116,7 @@ fun BottomBarSpace(
             type = ButtonType.RED,
             onClick = {
                 deleteItem(currItem)
-                navController.navigate(WearItScreen.Wardrobe.name)
+                returnToWardrobe()
             },
             text = "DELETE",
             icon = null,
@@ -127,7 +127,7 @@ fun BottomBarSpace(
 
         MasterButton(
             type = ButtonType.WHITE,
-            onClick = { navController.navigate(WearItScreen.Wardrobe.name) },
+            onClick = { returnToWardrobe() },
             text = "RETURN",
             icon = null,
             modifier = Modifier
@@ -226,7 +226,6 @@ fun ImagePreview(
                         )
                     }
                     .then(modifier)
-//                .height(LocalConfiguration.current.screenHeightDp.dp - innerPadding.calculateBottomPadding())
             )
         }
     }

@@ -5,6 +5,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import com.example.wearit.data.StoreSettings
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 private val DarkColorPalette = darkColors(
     primary = MainBlack,
@@ -22,20 +27,14 @@ private val LightColorPalette = lightColors(
     onSurface = White,
     background = White,
     onBackground = MainRed
-
-    /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    */
 )
 
 @Composable
-fun WearItTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val colors = if (darkTheme) {
+fun WearItTheme(content: @Composable () -> Unit) {
+    val dataStore = StoreSettings(LocalContext.current)
+    val isAppInDarkTheme = dataStore.getIsAppInDarkTheme.collectAsState(initial = runBlocking { dataStore.getIsAppInDarkTheme.first() })
+
+    val colors = if (isAppInDarkTheme.value) {
         DarkColorPalette
     } else {
         LightColorPalette

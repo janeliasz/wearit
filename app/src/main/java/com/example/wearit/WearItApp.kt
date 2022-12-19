@@ -2,6 +2,7 @@ package com.example.wearit
 
 import IntroScreen
 import ItemInfo
+import SettingsScreen
 import android.app.Application
 import androidx.compose.material.Text
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.wearit.data.AppViewModel
+import com.example.wearit.ui.FavoritesScreen
 import com.example.wearit.ui.PickerScreen
 import com.example.wearit.ui.WardrobeScreen
 
@@ -22,7 +24,9 @@ enum class WearItScreen() {
     Intro,
     Picker,
     Wardrobe,
-    ItemInfo
+    ItemInfo,
+    Favorites,
+    Settings
 }
 
 @Preview
@@ -32,6 +36,7 @@ fun WearItApp() {
     val uiState by viewModel.uiState.collectAsState()
     val items by viewModel.getAllItems.collectAsState()
     val outfits by viewModel.getAllOutfits.collectAsState()
+    val isAppInDarkTheme by viewModel.getIsAppInDarkTheme.collectAsState()
 
     val navController = rememberNavController()
 
@@ -62,8 +67,8 @@ fun WearItApp() {
                     )
                 },
                 drawSelection = { viewModel.drawItems() },
-                saveOutfit = { viewModel.saveOutfit() }
-
+                saveOutfit = { viewModel.saveOutfit() },
+                goToSettings = { navController.navigate(WearItScreen.Settings.name) }
             )
         }
 
@@ -80,10 +85,10 @@ fun WearItApp() {
                 },
                 setActiveInactive = { viewModel.setItemActiveInactive(it) },
                 currentCategory = uiState.currentCategory,
-                deleteItem = { viewModel.deleteItem(it) },
-                goToSingleItem = { itemId -> navController.navigate(WearItScreen.ItemInfo.name+"/${itemId}")}
+                goToSingleItem = { itemId -> navController.navigate(WearItScreen.ItemInfo.name+"/${itemId}")},
+                goToFavorites = { navController.navigate(WearItScreen.Favorites.name)},
+                deleteItem = { viewModel.deleteItem(it) }
             )
-
         }
         composable(
             route = "${WearItScreen.ItemInfo.name}/{itemId}",
@@ -100,6 +105,27 @@ fun WearItApp() {
                         itemId
                     )!!
                 },
+            )
+        }
+        composable(WearItScreen.Settings.name) {
+            SettingsScreen(
+                isAppInDarkTheme = isAppInDarkTheme,
+                switchTheme = { darkMode -> viewModel.switchTheme(darkMode) },
+                goToPicker = { navController.navigate(WearItScreen.Picker.name) }
+            )
+        }
+
+        composable(WearItScreen.Favorites.name){
+            FavoritesScreen(
+                goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
+                goToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
+                outfits = outfits,
+                getItemById = {viewModel.getItemById(it)  },
+                getItemPhotoByPhotoFilename = { itemId ->
+                    viewModel.getItemPhotoByPhotoFilename(
+                        itemId
+                    )!!
+                }
             )
         }
     }

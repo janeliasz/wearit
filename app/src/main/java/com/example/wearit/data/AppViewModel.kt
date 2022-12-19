@@ -2,7 +2,6 @@ package com.example.wearit.data
 
 import android.app.Application
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.lifecycle.*
 import com.example.wearit.model.AppUiState
 import com.example.wearit.model.Category
@@ -11,6 +10,7 @@ import com.example.wearit.model.Outfit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
@@ -20,6 +20,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: AppRepository
     val getAllItems: StateFlow<List<Item>>
     val getAllOutfits: StateFlow<List<Outfit>>
+
+    private val dataStore: StoreSettings
+    val getIsAppInDarkTheme: StateFlow<Boolean>
 
     init {
         val itemDao = AppDatabase.getInstance(application).itemDao()
@@ -39,6 +42,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             started = SharingStarted.WhileSubscribed(5000)
         )
 
+        dataStore = StoreSettings(application.applicationContext)
+
+        getIsAppInDarkTheme = dataStore.getIsAppInDarkTheme.stateIn(
+            initialValue = runBlocking { dataStore.getIsAppInDarkTheme.first() },
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000)
+        )
     }
 
     private val _uiState = MutableStateFlow(
@@ -172,6 +182,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 repository.addOutfit(outfit = newOutfit)
             }
+        }
+    }
+
+    fun switchTheme(darkMode: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dataStore.saveIsAppInDarkTheme(darkMode)
         }
     }
 }

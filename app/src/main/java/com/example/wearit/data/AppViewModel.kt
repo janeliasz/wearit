@@ -125,13 +125,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun saveItem(name: String, bitmap: Bitmap) {
         viewModelScope.launch(Dispatchers.IO) {
+            val currentCategory = _uiState.value.currentCategory
             val photoFilename = internalStorageHelper.savePhoto(bitmap)
             if (photoFilename != "") {
                 val newItem = Item(
                     id = 0,
                     name = name,
                     photoFilename = photoFilename,
-                    category = _uiState.value.currentCategory
+                    category = currentCategory
                 )
 
                 loadedPhotos[photoFilename] = bitmap

@@ -548,7 +548,10 @@ fun DeleteItemDialog(
 
                     MasterButton(
                         type = ButtonType.RED,
-                        onClick = { deleteItem(item) },
+                        onClick = {
+                            deleteItem(item)
+                            closeDialog()
+                        },
                         text = "DELETE",
                         icon = null,
                         modifier = Modifier

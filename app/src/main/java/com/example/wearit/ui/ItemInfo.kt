@@ -115,8 +115,8 @@ fun BottomBarSpace(
         MasterButton(
             type = ButtonType.RED,
             onClick = {
-                deleteItem(currItem)
                 returnToWardrobe()
+                deleteItem(currItem)
             },
             text = "DELETE",
             icon = null,

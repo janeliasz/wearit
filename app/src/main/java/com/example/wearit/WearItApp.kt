@@ -11,7 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
 import com.example.wearit.data.AppViewModel
+import com.example.wearit.ui.FavoritesScreen
 import com.example.wearit.ui.PickerScreen
 import com.example.wearit.ui.WardrobeScreen
 
@@ -19,6 +21,7 @@ enum class WearItScreen() {
     Intro,
     Picker,
     Wardrobe,
+    Favorites,
     Settings
 }
 
@@ -78,7 +81,11 @@ fun WearItApp() {
                 },
                 setActiveInactive = { viewModel.setItemActiveInactive(it) },
                 currentCategory = uiState.currentCategory,
+
+                goToFavorites = { navController.navigate(WearItScreen.Favorites.name)},
+
                 deleteItem = { viewModel.deleteItem(it) }
+
             )
         }
 
@@ -89,5 +96,20 @@ fun WearItApp() {
                 goToPicker = { navController.navigate(WearItScreen.Picker.name) }
             )
         }
+
+        composable(WearItScreen.Favorites.name){
+            FavoritesScreen(
+                goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
+                goToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
+                outfits = outfits,
+                getItemById = {viewModel.getItemById(it)  },
+                getItemPhotoByPhotoFilename = { itemId ->
+                    viewModel.getItemPhotoByPhotoFilename(
+                        itemId
+                    )!!
+                }
+            )
+        }
+
     }
 }

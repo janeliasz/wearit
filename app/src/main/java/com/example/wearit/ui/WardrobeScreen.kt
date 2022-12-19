@@ -54,8 +54,8 @@ fun WardrobeScreen(
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
-
-    ) {
+    goToFavorites:() -> Unit,
+) {
 
 
     val listOfCategories = Category.values().asList()
@@ -76,7 +76,8 @@ fun WardrobeScreen(
         },
         bottomBar = {
             BottomBarSpace(
-                goToPickerScreen = goToPickerScreen
+                goToPickerScreen = goToPickerScreen,
+                goToFavorites = goToFavorites
 
             )
         }
@@ -542,6 +543,7 @@ fun DeleteItemDialog(
 @Composable
 fun BottomBarSpace(
     goToPickerScreen: () -> Unit,
+    goToFavorites:() -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -562,11 +564,12 @@ fun BottomBarSpace(
 
         MasterButton(
             type = ButtonType.WHITE,
-            onClick = { TODO() },
+            onClick = goToFavorites,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            text = "FAVOURITES",
+            icon = null,
+            text = "Favorites",
         )
 
     }

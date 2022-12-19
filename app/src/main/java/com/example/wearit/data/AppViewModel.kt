@@ -153,13 +153,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deleteItem(item: Item) {
         viewModelScope.launch(Dispatchers.IO) {
-            internalStorageHelper.deleteFile(item.photoFilename)
-            repository.deleteItem(item)
             _uiState.update { currentState ->
                 currentState.copy(
                     currentSelection = _uiState.value.currentSelection.filter { id -> id != item.id }
                 )
             }
+            getAllOutfits.value.forEach { outfit ->
+                if (outfit.itemsInOutfit.contains(item.id)) {
+                    updateOutfit(outfit.copy(itemsInOutfit = outfit.itemsInOutfit.filter { itemId -> itemId != item.id }))
+                }
+            }
+            internalStorageHelper.deleteFile(item.photoFilename)
+            repository.deleteItem(item)
         }
     }
 
@@ -182,6 +187,23 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 repository.addOutfit(outfit = newOutfit)
             }
+        }
+    }
+
+    fun updateOutfit(outfit: Outfit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (outfit.itemsInOutfit.isEmpty()) {
+                deleteOutfit(outfit)
+            }
+            else {
+                repository.updateOutfit(outfit)
+            }
+        }
+    }
+
+    fun deleteOutfit(outfit: Outfit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteOutfit(outfit)
         }
     }
 

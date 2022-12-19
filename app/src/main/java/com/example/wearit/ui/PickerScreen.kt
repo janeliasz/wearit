@@ -23,7 +23,8 @@ fun PickerScreen(
     currentSelection: List<Item>,
     changeSelectedItem: (category: Category, next: Boolean) -> Unit,
     drawSelection: () -> Unit,
-    saveOutfit: () -> Unit
+    saveOutfit: () -> Unit,
+    goToSettings: () -> Unit
 ) {
     Column {
         Text(text = "This is Picker screen.")
@@ -60,6 +61,9 @@ fun PickerScreen(
                 Text(text = "Go to Wardrobe")
             }
 
+        }
+        Button(onClick = {goToSettings()}) {
+            Text(text = "Go to Settings")
         }
     }
 

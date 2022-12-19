@@ -1,8 +1,10 @@
 package com.example.wearit
 
 import IntroScreen
+import ItemInfo
 import SettingsScreen
 import android.app.Application
+import androidx.compose.material.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,7 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModel
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.wearit.data.AppViewModel
 import com.example.wearit.ui.FavoritesScreen
 import com.example.wearit.ui.PickerScreen
@@ -21,6 +24,7 @@ enum class WearItScreen() {
     Intro,
     Picker,
     Wardrobe,
+    ItemInfo,
     Favorites,
     Settings
 }
@@ -62,8 +66,8 @@ fun WearItApp() {
                         next
                     )
                 },
-                drawSelection = {viewModel.drawItems()},
-                saveOutfit = {viewModel.saveOutfit()},
+                drawSelection = { viewModel.drawItems() },
+                saveOutfit = { viewModel.saveOutfit() },
                 goToSettings = { navController.navigate(WearItScreen.Settings.name) }
             )
         }
@@ -81,14 +85,28 @@ fun WearItApp() {
                 },
                 setActiveInactive = { viewModel.setItemActiveInactive(it) },
                 currentCategory = uiState.currentCategory,
-
+                goToSingleItem = { itemId -> navController.navigate(WearItScreen.ItemInfo.name+"/${itemId}")},
                 goToFavorites = { navController.navigate(WearItScreen.Favorites.name)},
-
                 deleteItem = { viewModel.deleteItem(it) }
-
             )
         }
-
+        composable(
+            route = "${WearItScreen.ItemInfo.name}/{itemId}",
+            arguments = listOf(navArgument("itemId") { type = NavType.StringType })
+        ) {
+            backStackEntry ->
+            ItemInfo(
+                returnToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
+                itemId = backStackEntry.arguments?.getString("itemId")!!,
+                getItemById = { itemId -> viewModel.getItemById(itemId.toInt())!! },
+                deleteItem = { viewModel.deleteItem(it) },
+                getItemPhotoByPhotoFilename = { itemId ->
+                    viewModel.getItemPhotoByPhotoFilename(
+                        itemId
+                    )!!
+                },
+            )
+        }
         composable(WearItScreen.Settings.name) {
             SettingsScreen(
                 isAppInDarkTheme = isAppInDarkTheme,
@@ -110,6 +128,5 @@ fun WearItApp() {
                 }
             )
         }
-
     }
 }

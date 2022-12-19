@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavHostController
 import com.example.wearit.R
 import com.example.wearit.components.ButtonType
 import com.example.wearit.components.MasterButton
@@ -54,9 +55,9 @@ fun WardrobeScreen(
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
+    goToSingleItem: (itemId: Int) -> Unit,
     goToFavorites:() -> Unit,
 ) {
-
 
     val listOfCategories = Category.values().asList()
     Scaffold(
@@ -71,7 +72,8 @@ fun WardrobeScreen(
                 getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
                 setActiveInactive = setActiveInactive,
                 currentCategory = currentCategory,
-                deleteItem = deleteItem
+                deleteItem = deleteItem,
+                goToSingleItem = goToSingleItem
             )
         },
         bottomBar = {
@@ -95,6 +97,7 @@ fun WardrobePageContent(
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
+    goToSingleItem: (itemId: Int) -> Unit
 
     ) {
     var editing: Boolean by remember { mutableStateOf(false) }
@@ -123,7 +126,8 @@ fun WardrobePageContent(
                 currentCategory = currentCategory,
                 deleteItem = deleteItem,
                 editing = editing,
-                )
+                goToSingleItem = goToSingleItem,
+            )
         }
     }
 }
@@ -138,6 +142,8 @@ fun WardrobeClothesListSection(
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
+    goToSingleItem: (itemId: Int) -> Unit
+
 
 
     ) {
@@ -156,7 +162,8 @@ fun WardrobeClothesListSection(
             setActiveInactive = setActiveInactive,
             deleteItem = deleteItem,
             editing = editing,
-            )
+            goToSingleItem = goToSingleItem,
+        )
     }
 }
 
@@ -214,6 +221,8 @@ fun WardrobeListOfItemsFromCurrentCategory(
     setActiveInactive: (item: Item) -> Unit,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
+    goToSingleItem: (itemId: Int) -> Unit
+
 
     ) {
     Box(
@@ -235,6 +244,8 @@ fun WardrobeListOfItemsFromCurrentCategory(
                         setActiveInactive = setActiveInactive,
                         deleteItem = deleteItem,
                         editing = editing,
+                        goToSingleItem = goToSingleItem,
+
                     )
                 }
             }
@@ -244,6 +255,7 @@ fun WardrobeListOfItemsFromCurrentCategory(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SingleClothItem(
     item: Item,
@@ -251,6 +263,7 @@ fun SingleClothItem(
     setActiveInactive: (item: Item) -> Unit,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
+    goToSingleItem: (itemId: Int) -> Unit
 
     ) {
 
@@ -313,11 +326,19 @@ fun SingleClothItem(
         )
 
         Box(modifier = Modifier
-            .clip(shape = RoundedCornerShape(50.dp))
+            .clip(shape = RoundedCornerShape(50.dp)),
         ) {
             Column(
                 Modifier
-                    .clickable { setActiveInactive(item) }
+                    .height(150.dp)
+                    .combinedClickable (
+                        onClick = {
+                            setActiveInactive(item)
+                        },
+                        onLongClick = {
+                            goToSingleItem(item.id)
+                        },
+                    )
                     .border(
                         width = 5.dp,
                         color = MaterialTheme.colors.primary.copy(alpha = itemOpacity),
@@ -325,6 +346,7 @@ fun SingleClothItem(
                     )
                     .alpha(itemOpacity),
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
 
 
                 ) {
@@ -334,14 +356,13 @@ fun SingleClothItem(
                     contentDescription = item.name,
                     modifier = Modifier
                         .size(120.dp)
-                        .padding(5.dp, 10.dp, 5.dp, 0.dp)
                         .alpha(itemOpacity)
                 )
-                Text(
-                    text = item.name, textAlign = TextAlign.Center, modifier = Modifier
-                        .padding(5.dp, 0.dp, 5.dp, 10.dp)
-
-                )
+//                Text(
+//                    text = item.name, textAlign = TextAlign.Center, modifier = Modifier
+//                        .padding(5.dp, 0.dp, 5.dp, 10.dp)
+//
+//                )
             }
         }
     }

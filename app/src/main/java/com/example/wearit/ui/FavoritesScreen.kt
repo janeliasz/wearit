@@ -85,11 +85,11 @@ fun FavoritesContent(
         Box(modifier = Modifier.padding(top = 30.dp, bottom = 20.dp, start = 35.dp, end = 35.dp)) {
             MasterButton(
                 type = ButtonType.WHITE,
-                onClick = {editing=!editing},
+                onClick = { editing = !editing },
                 modifier = Modifier
                     .fillMaxWidth(),
                 icon = R.drawable.editing,
-                text = if(!editing) "EDIT" else "DONE",
+                text = if (!editing) "EDIT" else "DONE",
             )
         }
         LazyColumn(
@@ -102,8 +102,8 @@ fun FavoritesContent(
                     outfit = outfit,
                     getItemById = getItemById,
                     getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
-                    editing=editing,
-                    deleteOutfit=deleteOutfit
+                    editing = editing,
+                    deleteOutfit = deleteOutfit
                 )
             }
         }
@@ -120,28 +120,15 @@ fun singleOutfit(
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
     editing: Boolean,
     deleteOutfit: (Outfit) -> Unit
-    ) {
+) {
     val outfitOpacity: Float by animateFloatAsState(
-        targetValue = if (editing) 1f else 0.6f,
+        targetValue = if (!editing) 1f else 0.6f,
         animationSpec = tween(
             durationMillis = 500,
             easing = LinearEasing,
         )
     )
-    val tickOpacity: Float by animateFloatAsState(
-        targetValue = if (!editing) 1f else 0f,
-        animationSpec = tween(
-            durationMillis = 500,
-            easing = LinearEasing,
-        )
-    )
-    val deleteOpacity: Float by animateFloatAsState(
-        targetValue = if (editing) 1f else 0f,
-        animationSpec = tween(
-            durationMillis = 500,
-            easing = LinearEasing,
-        )
-    )
+
     var isDeleteOutfitDialogOpen by remember { mutableStateOf(false) }
 
     if (isDeleteOutfitDialogOpen) {
@@ -152,41 +139,48 @@ fun singleOutfit(
         )
     }
 
+    Box {
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .padding(5.dp, 5.dp)
-            .clip(shape = RoundedCornerShape(50.dp))
-            .fillMaxWidth()
-            .border(
-                width = 5.dp,
-                color = MaterialTheme.colors.primary.copy(alpha = outfitOpacity),
-                shape = RoundedCornerShape(50.dp)
+        if(editing){
+            ImageIcon(
+                modifier = Modifier
+                    .align(Alignment.TopEnd),
+                tickOpacity = 1f,
+                size = 30.dp,
+                icon = R.drawable.close,
+                onClick = {
+                    if (editing) isDeleteOutfitDialogOpen = !isDeleteOutfitDialogOpen
+                }
             )
-            .alpha(outfitOpacity)
+        }
 
-    ) {
-        ImageIcon(
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .align(Alignment.TopEnd),
-            tickOpacity = deleteOpacity,
-            size = 30.dp,
-            icon = R.drawable.close,
-            onClick = {
-                if (editing) isDeleteOutfitDialogOpen = !isDeleteOutfitDialogOpen
-            }
-        )
-        MakeHorizontalPager(
-            outfit.itemsInOutfit,
-            getItemById,
-            getItemPhotoByPhotoFilename
-        )
+                .padding(5.dp, 5.dp)
+                .clip(shape = RoundedCornerShape(50.dp))
+                .fillMaxWidth()
+                .border(
+                    width = 5.dp,
+                    color = MaterialTheme.colors.primary.copy(alpha = outfitOpacity),
+                    shape = RoundedCornerShape(50.dp)
+                )
+                .alpha(outfitOpacity)
 
+        ) {
+            MakeHorizontalPager(
+                outfit.itemsInOutfit,
+                getItemById,
+                getItemPhotoByPhotoFilename,
+                outfitOpacity
+            )
+
+        }
     }
 
 
 }
+
 @Composable
 fun DeleteOutfitDialog(
     closeDialog: () -> Unit,
@@ -208,7 +202,8 @@ fun DeleteOutfitDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
 
             ) {
-                Text(text = "CONFIRM DELETE:",
+                Text(
+                    text = "CONFIRM DELETE:",
                     style = MaterialTheme.typography.caption,
                     modifier = Modifier
                         .padding(0.dp, 15.dp, 0.dp, 5.dp)
@@ -250,7 +245,8 @@ fun DeleteOutfitDialog(
 fun MakeHorizontalPager(
     itemsInOutfit: List<Int>,
     getItemById: (Int) -> Item?,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    outfitOpacity: Float
 
 ) {
     val pagerState = rememberPagerState(initialPage = 0)
@@ -258,7 +254,9 @@ fun MakeHorizontalPager(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .alpha(outfitOpacity)
     ) {
         HorizontalPager(
             count = itemsInOutfit.size,
@@ -276,6 +274,7 @@ fun MakeHorizontalPager(
                     modifier = Modifier
                         .size(width = 200.dp, height = 340.dp)
                         .padding(bottom = 5.dp, top = 5.dp)
+                        .alpha(outfitOpacity)
                 )
             }
 

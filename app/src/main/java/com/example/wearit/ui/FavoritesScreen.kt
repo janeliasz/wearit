@@ -1,7 +1,11 @@
 package com.example.wearit.ui
 
+import ImageIcon
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,14 +18,15 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.example.wearit.R
 import com.example.wearit.components.ButtonType
 import com.example.wearit.components.MasterButton
@@ -40,6 +45,7 @@ fun FavoritesScreen(
     outfits: List<Outfit>,
     getItemById: (Int) -> Item?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    deleteOutfit: (Outfit) -> Unit
 ) {
     Scaffold(
         content = { innerPadding ->
@@ -47,7 +53,8 @@ fun FavoritesScreen(
             FavoritesContent(
                 outfits = outfits,
                 getItemById = getItemById,
-                getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename
+                getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
+                deleteOutfit = deleteOutfit,
             )
 
         },
@@ -66,17 +73,23 @@ fun FavoritesScreen(
 fun FavoritesContent(
     outfits: List<Outfit>,
     getItemById: (Int) -> Item?,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    deleteOutfit: (Outfit) -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(bottom = 75.dp)) {
-        Box(modifier = Modifier.padding(top=30.dp, bottom = 20.dp, start = 35.dp, end = 35.dp)) {
+    var editing: Boolean by remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 75.dp)
+    ) {
+        Box(modifier = Modifier.padding(top = 30.dp, bottom = 20.dp, start = 35.dp, end = 35.dp)) {
             MasterButton(
                 type = ButtonType.WHITE,
-                onClick = { /*todo*/ },
+                onClick = {editing=!editing},
                 modifier = Modifier
                     .fillMaxWidth(),
                 icon = R.drawable.editing,
-                text = "EDIT",
+                text = if(!editing) "EDIT" else "DONE",
             )
         }
         LazyColumn(
@@ -85,33 +98,150 @@ fun FavoritesContent(
             verticalArrangement = Arrangement.spacedBy(50.dp),
         ) {
             items(outfits) { outfit ->
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .padding(5.dp, 5.dp)
-                        .clip(shape = RoundedCornerShape(50.dp))
-                        .fillMaxWidth()
-                        .border(
-                            width = 5.dp,
-                            color = MaterialTheme.colors.primary.copy(alpha = LocalContentAlpha.current),
-                            shape = RoundedCornerShape(50.dp)
-                        )
-
-                ) {
-
-                    MakeHorizontalPager(
-                        outfit.itemsInOutfit,
-                        getItemById,
-                        getItemPhotoByPhotoFilename
-                    );
-
-                }
+                singleOutfit(
+                    outfit = outfit,
+                    getItemById = getItemById,
+                    getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
+                    editing=editing,
+                    deleteOutfit=deleteOutfit
+                )
             }
         }
 
     }
 
 
+}
+
+@Composable
+fun singleOutfit(
+    outfit: Outfit,
+    getItemById: (Int) -> Item?,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    editing: Boolean,
+    deleteOutfit: (Outfit) -> Unit
+    ) {
+    val outfitOpacity: Float by animateFloatAsState(
+        targetValue = if (editing) 1f else 0.6f,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = LinearEasing,
+        )
+    )
+    val tickOpacity: Float by animateFloatAsState(
+        targetValue = if (!editing) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = LinearEasing,
+        )
+    )
+    val deleteOpacity: Float by animateFloatAsState(
+        targetValue = if (editing) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = LinearEasing,
+        )
+    )
+    var isDeleteOutfitDialogOpen by remember { mutableStateOf(false) }
+
+    if (isDeleteOutfitDialogOpen) {
+        DeleteOutfitDialog(
+            closeDialog = { isDeleteOutfitDialogOpen = false },
+            deleteOutfit = deleteOutfit,
+            outfit = outfit,
+        )
+    }
+
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .padding(5.dp, 5.dp)
+            .clip(shape = RoundedCornerShape(50.dp))
+            .fillMaxWidth()
+            .border(
+                width = 5.dp,
+                color = MaterialTheme.colors.primary.copy(alpha = outfitOpacity),
+                shape = RoundedCornerShape(50.dp)
+            )
+            .alpha(outfitOpacity)
+
+    ) {
+        ImageIcon(
+            modifier = Modifier
+                .align(Alignment.TopEnd),
+            tickOpacity = deleteOpacity,
+            size = 30.dp,
+            icon = R.drawable.close,
+            onClick = {
+                if (editing) isDeleteOutfitDialogOpen = !isDeleteOutfitDialogOpen
+            }
+        )
+        MakeHorizontalPager(
+            outfit.itemsInOutfit,
+            getItemById,
+            getItemPhotoByPhotoFilename
+        )
+
+    }
+
+
+}
+@Composable
+fun DeleteOutfitDialog(
+    closeDialog: () -> Unit,
+    deleteOutfit: (Outfit) -> Unit,
+    outfit: Outfit,
+) {
+    Dialog(
+        onDismissRequest = closeDialog,
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+
+                horizontalAlignment = Alignment.CenterHorizontally
+
+            ) {
+                Text(text = "CONFIRM DELETE:",
+                    style = MaterialTheme.typography.caption,
+                    modifier = Modifier
+                        .padding(0.dp, 15.dp, 0.dp, 5.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp, 5.dp, 0.dp, 15.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    MasterButton(
+                        type = ButtonType.WHITE,
+                        onClick = closeDialog,
+                        text = "CANCEL",
+                        icon = null,
+                        modifier = Modifier
+                    )
+
+                    MasterButton(
+                        type = ButtonType.RED,
+                        onClick = {
+                            deleteOutfit(outfit)
+                            closeDialog()
+                        },
+                        text = "DELETE",
+                        icon = null,
+                        modifier = Modifier
+                    )
+                }
+            }
+
+        }
+    }
 }
 
 
@@ -137,16 +267,17 @@ fun MakeHorizontalPager(
                 .fillMaxWidth()
         ) { currentPage ->
 
-                val finalItem = getItemById(itemsInOutfit[currentPage])
+            val finalItem = getItemById(itemsInOutfit[currentPage])
 
-                if(finalItem!=null){
-                    Image(
-                        bitmap = getItemPhotoByPhotoFilename(finalItem.photoFilename).asImageBitmap(),
-                        contentDescription = finalItem.name,
-                        modifier = Modifier
-                            .size(width = 200.dp, height = 340.dp).padding(bottom = 5.dp,top=5.dp)
-                    )
-                }
+            if (finalItem != null) {
+                Image(
+                    bitmap = getItemPhotoByPhotoFilename(finalItem.photoFilename).asImageBitmap(),
+                    contentDescription = finalItem.name,
+                    modifier = Modifier
+                        .size(width = 200.dp, height = 340.dp)
+                        .padding(bottom = 5.dp, top = 5.dp)
+                )
+            }
 
         }
         Box(
@@ -171,34 +302,35 @@ fun BottomBar(
     goToPickerScreen: () -> Unit,
     goToWardrobe: () -> Unit,
 ) {
-        Row(
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colors.background)
+            .padding(10.dp)
+            .height(100.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        MasterButton(
+            onClick = goToPickerScreen,
             modifier = Modifier
-                .fillMaxWidth().background(color = MaterialTheme.colors.background)
-                .padding(10.dp)
-                .height(100.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            MasterButton(
-                onClick = goToPickerScreen,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                icon = R.drawable.dice,
-                text = "DRAW",
-            )
+                .fillMaxWidth()
+                .weight(1f),
+            icon = R.drawable.dice,
+            text = "DRAW",
+        )
 
-            MasterButton(
-                type = ButtonType.WHITE,
-                onClick = goToWardrobe,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                icon = null,
-                text = "Wardrobe",
-            )
+        MasterButton(
+            type = ButtonType.WHITE,
+            onClick = goToWardrobe,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            icon = null,
+            text = "Wardrobe",
+        )
 
-        }
+    }
 
 
 }

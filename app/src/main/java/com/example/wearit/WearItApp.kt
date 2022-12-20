@@ -4,6 +4,7 @@ import IntroScreen
 import ItemInfo
 import SettingsScreen
 import android.app.Application
+import android.view.View
 import androidx.compose.material.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.wearit.data.AppViewModel
@@ -121,6 +123,7 @@ fun WearItApp() {
                 goToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
                 outfits = outfits,
                 getItemById = {viewModel.getItemById(it)  },
+                deleteOutfit={viewModel.deleteOutfit(it)},
                 getItemPhotoByPhotoFilename = { itemId ->
                     viewModel.getItemPhotoByPhotoFilename(
                         itemId

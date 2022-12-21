@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.zIndex
 import com.example.wearit.R
 import com.example.wearit.components.ButtonType
 import com.example.wearit.components.MasterButton
@@ -141,12 +142,23 @@ fun SingleOutfit(
 
     Box {
 
-
+        if(editing){
+            ImageIcon(
+                modifier = Modifier
+                    .align(Alignment.TopEnd).padding(top=5.dp),
+                tickOpacity = 1f,
+                size = 35.dp,
+                icon = R.drawable.close,
+                onClick = {
+                    if (editing) isDeleteOutfitDialogOpen = !isDeleteOutfitDialogOpen
+                }
+            )
+        }
 
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .padding(0.dp, 10.dp)
+                .padding(0.dp, 5.dp)
                 .clip(shape = RoundedCornerShape(50.dp))
                 .fillMaxWidth()
                 .border(
@@ -157,18 +169,6 @@ fun SingleOutfit(
                 .alpha(outfitOpacity)
 
         ) {
-            if(editing){
-                ImageIcon(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd),
-                    tickOpacity = 1f,
-                    size = 30.dp,
-                    icon = R.drawable.close,
-                    onClick = {
-                        if (editing) isDeleteOutfitDialogOpen = !isDeleteOutfitDialogOpen
-                    }
-                )
-            }
 
             MakeHorizontalPager(
                 outfit.itemsInOutfit,

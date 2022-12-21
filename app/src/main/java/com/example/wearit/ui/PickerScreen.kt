@@ -9,11 +9,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,12 +26,14 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
-import coil.size.Scale
+import coil.size.Size
 import com.example.wearit.R
 import com.example.wearit.components.ButtonType
 import com.example.wearit.components.MasterButton
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun PickerScreen(
@@ -57,6 +57,11 @@ fun PickerScreen(
 
         },
         bottomBar = {
+            Divider(
+                color = MaterialTheme.colors.primary,
+                thickness = 5.dp,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
             BottomBarPicker(
                 drawSelection = drawSelection,
                 saveOutfit = saveOutfit,
@@ -73,90 +78,107 @@ fun PickerContent(
     currentSelection: List<Item>,
     changeSelectedItem: (category: Category, next: Boolean) -> Unit,
     goToSettings: () -> Unit
-
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(75.dp)
-            .padding(10.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.wearit),
-            contentDescription = "Logo text",
-            modifier = Modifier.align(Alignment.Center),
-            contentScale = ContentScale.Fit
-
-        )
-
-        Image(
-            painter = painterResource(id = R.drawable.settings),
-            contentDescription = "Settings",
+    Column(verticalArrangement = Arrangement.Center) {
+        Box(
             modifier = Modifier
-                .clickable { goToSettings() }
-                .align(Alignment.CenterEnd),
-            contentScale = ContentScale.Fit
-        )
-    }
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 100.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        items(currentSelection) { item ->
+                .fillMaxWidth()
+                .padding(top = 15.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.wearit),
+                contentDescription = "Logo text",
+                modifier = Modifier.align(Alignment.Center),
+                contentScale = ContentScale.Fit
 
-            Row(
+            )
+
+            Image(
+                painter = painterResource(id = R.drawable.settings),
+                contentDescription = "Settings",
                 modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .clickable { goToSettings() }
+                    .align(Alignment.CenterEnd),
+                contentScale = ContentScale.Fit
+            )
+        }
+
+        if (currentSelection.isEmpty()) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxSize().padding(bottom = 70.dp)
             ) {
+                Text(text = "You have to draw your items first")
+                GifImage(gif = R.drawable.down, modifier = Modifier.size(100.dp).align(Alignment.BottomStart))
+            }
 
-                GifImage(
-                    gif = R.drawable.left,
-                    modifier = Modifier
-                        .clickable { changeSelectedItem(item.category, false) }
-                        .align(Alignment.CenterVertically)
-                        .fillParentMaxSize(0.15f)
-                )
+        }
 
 
-                Box(
-                    contentAlignment = Alignment.Center,
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp, bottom = 75.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(currentSelection) { item ->
+
+                Row(
                     modifier = Modifier
                         .padding(10.dp)
-                        .clip(shape = RoundedCornerShape(50.dp))
-                        .align(Alignment.CenterVertically)
-                        .border(
-                            width = 5.dp,
-                            color = MaterialTheme.colors.primary.copy(alpha = LocalContentAlpha.current),
-                            shape = RoundedCornerShape(50.dp)
-                        )
-                        .fillMaxWidth(0.65f)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Image(
-                        bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
-                        contentDescription = item.name,
-                        modifier = Modifier.padding(20.dp),
-                        contentScale = ContentScale.Fit
+
+                    GifImage(
+                        gif = R.drawable.left,
+                        modifier = Modifier
+                            .clickable { changeSelectedItem(item.category, false) }
+                            .align(Alignment.CenterVertically)
+                            .padding(10.dp)
+                            .weight(0.2f, fill = true)
+
                     )
+
+
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clip(shape = RoundedCornerShape(50.dp))
+                            .align(Alignment.CenterVertically)
+                            .weight(0.6f, fill = true)
+                            .height(300.dp)
+                            .border(
+                                width = 5.dp,
+                                color = MaterialTheme.colors.primary.copy(alpha = LocalContentAlpha.current),
+                                shape = RoundedCornerShape(50.dp)
+                            )
+                    ) {
+                        Image(
+                            bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
+                            contentDescription = item.name,
+                            modifier = Modifier.padding(20.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
+
+                    GifImage(
+                        gif = R.drawable.right,
+                        modifier = Modifier
+                            .clickable { changeSelectedItem(item.category, true) }
+                            .align(Alignment.CenterVertically)
+                            .padding(10.dp)
+                            .weight(0.2f, fill = true)
+
+                    )
+
+
                 }
-
-                GifImage(
-                    gif = R.drawable.right,
-                    modifier = Modifier
-                        .clickable { changeSelectedItem(item.category, true) }
-                        .align(Alignment.CenterVertically)
-                        .fillParentMaxSize(0.15f)
-                )
-
-
             }
         }
     }
-
 }
 
 @Composable
@@ -167,7 +189,7 @@ fun GifImage(
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
         .components {
-            if (SDK_INT >= 100) {
+            if (SDK_INT >= 26) {
                 add(ImageDecoderDecoder.Factory())
             } else {
                 add(GifDecoder.Factory())
@@ -177,12 +199,12 @@ fun GifImage(
     Image(
         painter = rememberAsyncImagePainter(
             ImageRequest.Builder(context).data(data = gif).apply(block = {
-                scale(Scale.FIT)
+                size(Size.ORIGINAL)
             }).build(), imageLoader = imageLoader
         ),
         contentDescription = null,
         modifier = modifier.fillMaxWidth(),
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Fit
     )
 }
 
@@ -192,37 +214,68 @@ fun BottomBarPicker(
     saveOutfit: () -> Unit,
     goToWardrobe: () -> Unit
 ) {
-    Divider(color = MaterialTheme.colors.primary, thickness = 5.dp)
-    Row(
+
+
+    val scaffoldState: ScaffoldState = rememberScaffoldState()
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+
+    Scaffold(
+        scaffoldState = scaffoldState,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
-            .height(80.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(7.dp)
+            .padding(top = 10.dp)
+            .height(70.dp),
+        backgroundColor = MaterialTheme.colors.background,
+        snackbarHost = {
+            // reuse default SnackbarHost to have default animation and timing handling
+            SnackbarHost(it) { data ->
+                // custom snackbar with the custom colors
+                Snackbar(
+                    actionColor = MaterialTheme.colors.primary,
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = MaterialTheme.colors.primary,
+                    snackbarData = data
+                )
+            }
+        }
     ) {
-        MasterButton(
-            onClick = drawSelection,
-            icon = R.drawable.dice,
-            modifier = Modifier.weight(1f, fill = true),
-            text = "DRAW",
-            fontSize = 15.sp
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(7.dp)
+        ) {
+
+            MasterButton(
+                onClick = drawSelection,
+                icon = R.drawable.dice,
+                modifier = Modifier.weight(1f, fill = true),
+                text = "DRAW",
+                fontSize = 15.sp
+            )
+
+            MasterButton(
+                type = ButtonType.WHITE,
+                icon = R.drawable.diskette,
+                onClick = {
+                    coroutineScope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = "outfit saved correctly",
+                            actionLabel = null
+                        )
+                        saveOutfit()
+                    }
+                }
+            )
+
+            MasterButton(
+                onClick = goToWardrobe,
+                modifier = Modifier.weight(1f, fill = true),
+                icon = null,
+                text = "WARDROBE",
+                fontSize = 15.sp
+            )
+        }
 
 
-        MasterButton(
-            type = ButtonType.WHITE,
-            onClick = saveOutfit,
-            icon = R.drawable.diskette,
-        )
-
-        MasterButton(
-            onClick = goToWardrobe,
-            modifier = Modifier.weight(1f, fill = true),
-            icon = null,
-            text = "WARDROBE",
-            fontSize = 15.sp
-        )
     }
 
 }

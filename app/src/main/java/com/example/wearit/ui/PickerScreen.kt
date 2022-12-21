@@ -28,7 +28,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
-import coil.size.Scale
+import coil.size.Size
 import com.example.wearit.R
 import com.example.wearit.components.ButtonType
 import com.example.wearit.components.MasterButton
@@ -73,13 +73,10 @@ fun PickerContent(
     currentSelection: List<Item>,
     changeSelectedItem: (category: Category, next: Boolean) -> Unit,
     goToSettings: () -> Unit
-
 ) {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(75.dp)
-            .padding(10.dp),
+            .fillMaxWidth(),
         contentAlignment = Alignment.Center,
     ) {
         Image(
@@ -99,10 +96,12 @@ fun PickerContent(
             contentScale = ContentScale.Fit
         )
     }
+
+
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 100.dp),
+            .padding(top= 50.dp, bottom = 100.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         items(currentSelection) { item ->
@@ -119,7 +118,8 @@ fun PickerContent(
                     modifier = Modifier
                         .clickable { changeSelectedItem(item.category, false) }
                         .align(Alignment.CenterVertically)
-                        .fillParentMaxSize(0.15f)
+                        .padding(10.dp).weight(0.2f,fill=true)
+
                 )
 
 
@@ -129,12 +129,12 @@ fun PickerContent(
                         .padding(10.dp)
                         .clip(shape = RoundedCornerShape(50.dp))
                         .align(Alignment.CenterVertically)
+                        .weight(0.6f, fill = true).height(300.dp)
                         .border(
                             width = 5.dp,
                             color = MaterialTheme.colors.primary.copy(alpha = LocalContentAlpha.current),
                             shape = RoundedCornerShape(50.dp)
                         )
-                        .fillMaxWidth(0.65f)
                 ) {
                     Image(
                         bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
@@ -149,7 +149,8 @@ fun PickerContent(
                     modifier = Modifier
                         .clickable { changeSelectedItem(item.category, true) }
                         .align(Alignment.CenterVertically)
-                        .fillParentMaxSize(0.15f)
+                        .padding(10.dp).weight(0.2f,fill=true)
+
                 )
 
 
@@ -167,7 +168,7 @@ fun GifImage(
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
         .components {
-            if (SDK_INT >= 100) {
+            if (SDK_INT >= 26) {
                 add(ImageDecoderDecoder.Factory())
             } else {
                 add(GifDecoder.Factory())
@@ -177,12 +178,12 @@ fun GifImage(
     Image(
         painter = rememberAsyncImagePainter(
             ImageRequest.Builder(context).data(data = gif).apply(block = {
-                scale(Scale.FIT)
+                size(Size.ORIGINAL)
             }).build(), imageLoader = imageLoader
         ),
         contentDescription = null,
         modifier = modifier.fillMaxWidth(),
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Fit
     )
 }
 

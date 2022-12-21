@@ -98,7 +98,7 @@ fun FavoritesContent(
             verticalArrangement = Arrangement.spacedBy(50.dp),
         ) {
             items(outfits) { outfit ->
-                singleOutfit(
+                SingleOutfit(
                     outfit = outfit,
                     getItemById = getItemById,
                     getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
@@ -114,7 +114,7 @@ fun FavoritesContent(
 }
 
 @Composable
-fun singleOutfit(
+fun SingleOutfit(
     outfit: Outfit,
     getItemById: (Int) -> Item?,
     getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
@@ -141,33 +141,35 @@ fun singleOutfit(
 
     Box {
 
-        if(editing){
-            ImageIcon(
-                modifier = Modifier
-                    .align(Alignment.TopEnd),
-                tickOpacity = 1f,
-                size = 30.dp,
-                icon = R.drawable.close,
-                onClick = {
-                    if (editing) isDeleteOutfitDialogOpen = !isDeleteOutfitDialogOpen
-                }
-            )
-        }
+
 
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .padding(5.dp, 5.dp)
+                .padding(0.dp, 10.dp)
                 .clip(shape = RoundedCornerShape(50.dp))
                 .fillMaxWidth()
                 .border(
                     width = 5.dp,
-                    color = MaterialTheme.colors.primary.copy(alpha = outfitOpacity),
+                    color = MaterialTheme.colors.primary,
                     shape = RoundedCornerShape(50.dp)
                 )
                 .alpha(outfitOpacity)
 
         ) {
+            if(editing){
+                ImageIcon(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd),
+                    tickOpacity = 1f,
+                    size = 30.dp,
+                    icon = R.drawable.close,
+                    onClick = {
+                        if (editing) isDeleteOutfitDialogOpen = !isDeleteOutfitDialogOpen
+                    }
+                )
+            }
+
             MakeHorizontalPager(
                 outfit.itemsInOutfit,
                 getItemById,

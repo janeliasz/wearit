@@ -42,10 +42,15 @@ fun PickerScreen(
     currentSelection: List<Item>,
     changeSelectedItem: (category: Category, next: Boolean) -> Unit,
     drawSelection: () -> Unit,
-    saveOutfit: () -> Unit,
+    saveOutfit: () -> Boolean?,
     goToSettings: () -> Unit
 ) {
+    val scaffoldState: ScaffoldState = rememberScaffoldState()
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+
     Scaffold(
+        scaffoldState = scaffoldState,
+        modifier = Modifier.fillMaxSize(),
         content = { innerPadding ->
             //giving padding to whole content so it doesnt overlap with bottomBar
             PickerContent(
@@ -60,14 +65,28 @@ fun PickerScreen(
             Divider(
                 color = MaterialTheme.colors.primary,
                 thickness = 5.dp,
-                modifier = Modifier.padding(bottom = 20.dp)
             )
             BottomBarPicker(
                 drawSelection = drawSelection,
                 saveOutfit = saveOutfit,
-                goToWardrobe = goToWardrobe
+                goToWardrobe = goToWardrobe,
+                scaffoldState = scaffoldState,
+                coroutineScope = coroutineScope
             )
+        },
+        snackbarHost = {
+            // reuse default SnackbarHost to have default animation and timing handling
+            SnackbarHost(it) { data ->
+                // custom snackbar with the custom colors
+                Snackbar(
+                    actionColor = MaterialTheme.colors.primary,
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = MaterialTheme.colors.primary,
+                    snackbarData = data,
+                )
+            }
         }
+
     )
 
 }
@@ -107,7 +126,8 @@ fun PickerContent(
         if (currentSelection.isEmpty()) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .fillMaxSize().padding(bottom = 70.dp)
+                .fillMaxSize()
+                .padding(bottom = 75.dp)
             ) {
                 Text(text = "You have to draw your items first")
                 GifImage(gif = R.drawable.down, modifier = Modifier.size(100.dp).align(Alignment.BottomStart))
@@ -119,7 +139,7 @@ fun PickerContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 10.dp, bottom = 75.dp),
+                .padding(top = 10.dp, bottom = 80.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(currentSelection) { item ->
@@ -181,6 +201,62 @@ fun PickerContent(
     }
 }
 
+
+@Composable
+fun BottomBarPicker(
+    drawSelection: () -> Unit,
+    saveOutfit: () -> Boolean?,
+    goToWardrobe: () -> Unit,
+    coroutineScope: CoroutineScope,
+    scaffoldState: ScaffoldState
+) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+            modifier = Modifier.padding(vertical = 17.dp, horizontal = 10.dp)
+        ) {
+
+            MasterButton(
+                onClick = drawSelection,
+                icon = R.drawable.dice,
+                modifier = Modifier.weight(1f, fill = true),
+                text = "DRAW",
+                fontSize = 15.sp
+            )
+
+            MasterButton(
+                type = ButtonType.WHITE,
+                icon = R.drawable.diskette,
+                onClick = {
+                    val saved=saveOutfit()
+                    var message=""
+                    coroutineScope.launch {
+                        message = when (saved) {
+                            null -> "Outfit can't be empty"
+                            false -> "Outfit already saved"
+                            true -> "Outfit saved properly"
+                        }
+
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = message,
+                            actionLabel = null
+                        )
+
+                    }
+                }
+            )
+
+            MasterButton(
+                onClick = goToWardrobe,
+                modifier = Modifier.weight(1f, fill = true),
+                icon = null,
+                text = "WARDROBE",
+                fontSize = 15.sp
+            )
+        }
+}
+
+
 @Composable
 fun GifImage(
     modifier: Modifier = Modifier,
@@ -206,76 +282,4 @@ fun GifImage(
         modifier = modifier.fillMaxWidth(),
         contentScale = ContentScale.Fit
     )
-}
-
-@Composable
-fun BottomBarPicker(
-    drawSelection: () -> Unit,
-    saveOutfit: () -> Unit,
-    goToWardrobe: () -> Unit
-) {
-
-
-    val scaffoldState: ScaffoldState = rememberScaffoldState()
-    val coroutineScope: CoroutineScope = rememberCoroutineScope()
-
-    Scaffold(
-        scaffoldState = scaffoldState,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp)
-            .height(70.dp),
-        backgroundColor = MaterialTheme.colors.background,
-        snackbarHost = {
-            // reuse default SnackbarHost to have default animation and timing handling
-            SnackbarHost(it) { data ->
-                // custom snackbar with the custom colors
-                Snackbar(
-                    actionColor = MaterialTheme.colors.primary,
-                    backgroundColor = MaterialTheme.colors.background,
-                    contentColor = MaterialTheme.colors.primary,
-                    snackbarData = data
-                )
-            }
-        }
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(7.dp)
-        ) {
-
-            MasterButton(
-                onClick = drawSelection,
-                icon = R.drawable.dice,
-                modifier = Modifier.weight(1f, fill = true),
-                text = "DRAW",
-                fontSize = 15.sp
-            )
-
-            MasterButton(
-                type = ButtonType.WHITE,
-                icon = R.drawable.diskette,
-                onClick = {
-                    coroutineScope.launch {
-                        scaffoldState.snackbarHostState.showSnackbar(
-                            message = "outfit saved correctly",
-                            actionLabel = null
-                        )
-                        saveOutfit()
-                    }
-                }
-            )
-
-            MasterButton(
-                onClick = goToWardrobe,
-                modifier = Modifier.weight(1f, fill = true),
-                icon = null,
-                text = "WARDROBE",
-                fontSize = 15.sp
-            )
-        }
-
-
-    }
-
 }

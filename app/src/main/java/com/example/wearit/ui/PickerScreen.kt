@@ -83,6 +83,8 @@ fun PickerScreen(
                     backgroundColor = MaterialTheme.colors.background,
                     contentColor = MaterialTheme.colors.primary,
                     snackbarData = data,
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
         }
@@ -103,24 +105,17 @@ fun PickerContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 15.dp),
-            contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.TopCenter,
         ) {
             Image(
                 painter = painterResource(id = R.drawable.wearit),
                 contentDescription = "Logo text",
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier.align(Alignment.TopCenter).size(150.dp,50.dp),
                 contentScale = ContentScale.Fit
 
             )
 
-            Image(
-                painter = painterResource(id = R.drawable.settings),
-                contentDescription = "Settings",
-                modifier = Modifier
-                    .clickable { goToSettings() }
-                    .align(Alignment.CenterEnd),
-                contentScale = ContentScale.Fit
-            )
+            GifImage(gif = R.drawable.settings, modifier = Modifier.size(50.dp).align(Alignment.TopEnd), onClick = goToSettings)
         }
 
         if (currentSelection.isEmpty()) {
@@ -130,7 +125,9 @@ fun PickerContent(
                 .padding(bottom = 75.dp)
             ) {
                 Text(text = "You have to draw your items first")
-                GifImage(gif = R.drawable.down, modifier = Modifier.size(100.dp).align(Alignment.BottomStart))
+                GifImage(gif = R.drawable.down, modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.BottomStart))
             }
 
         }
@@ -239,7 +236,8 @@ fun BottomBarPicker(
 
                         scaffoldState.snackbarHostState.showSnackbar(
                             message = message,
-                            actionLabel = null
+                            actionLabel = null,
+                            duration = SnackbarDuration.Short
                         )
 
                     }
@@ -261,6 +259,7 @@ fun BottomBarPicker(
 fun GifImage(
     modifier: Modifier = Modifier,
     gif: Int,
+    onClick:()->Unit={}
 ) {
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
@@ -276,10 +275,11 @@ fun GifImage(
         painter = rememberAsyncImagePainter(
             ImageRequest.Builder(context).data(data = gif).apply(block = {
                 size(Size.ORIGINAL)
-            }).build(), imageLoader = imageLoader
+            }).build(),
+            imageLoader = imageLoader,
         ),
         contentDescription = null,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().clickable{onClick()},
         contentScale = ContentScale.Fit
     )
 }

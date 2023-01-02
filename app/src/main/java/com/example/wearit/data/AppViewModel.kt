@@ -187,19 +187,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         var flag = false
 
-        viewModelScope.launch(Dispatchers.IO) {
+        if (!getAllOutfits.value.any { it.itemsInOutfit.sorted() == _uiState.value.currentSelection.sorted() }) {
 
-            if (!getAllOutfits.value.any { it.itemsInOutfit.sorted() == _uiState.value.currentSelection.sorted() }) {
-                val newOutfit = Outfit(
-                    id = 0,
-                    itemsInOutfit = _uiState.value.currentSelection
-                )
+            val newOutfit = Outfit(
+                id = 0,
+                itemsInOutfit = _uiState.value.currentSelection
+            )
+            viewModelScope.launch(Dispatchers.IO) {
                 repository.addOutfit(outfit = newOutfit)
-
-                flag = true
             }
 
+            flag = true
         }
+
+
 
         return flag
     }

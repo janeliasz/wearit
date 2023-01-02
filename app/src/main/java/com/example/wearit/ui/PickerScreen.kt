@@ -151,11 +151,10 @@ fun PickerContent(
                     GifImage(
                         gif = R.drawable.left,
                         modifier = Modifier
-                            .clickable { changeSelectedItem(item.category, false) }
                             .align(Alignment.CenterVertically)
                             .padding(10.dp)
-                            .weight(0.2f, fill = true)
-
+                            .weight(0.2f, fill = true),
+                        onClick= { changeSelectedItem(item.category, false) }
                     )
 
 
@@ -184,10 +183,10 @@ fun PickerContent(
                     GifImage(
                         gif = R.drawable.right,
                         modifier = Modifier
-                            .clickable { changeSelectedItem(item.category, true) }
                             .align(Alignment.CenterVertically)
                             .padding(10.dp)
-                            .weight(0.2f, fill = true)
+                            .weight(0.2f, fill = true),
+                        onClick= { changeSelectedItem(item.category, false) }
 
                     )
 

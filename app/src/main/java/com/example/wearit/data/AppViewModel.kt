@@ -2,7 +2,8 @@ package com.example.wearit.data
 
 import android.app.Application
 import android.graphics.Bitmap
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.wearit.model.AppUiState
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
@@ -11,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlin.collections.set
 import kotlin.random.Random
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
@@ -79,7 +81,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 itemId
             else {
                 val activeItemListWithCurrentItem = itemList
-                    .filter { (it.category == category && it.isActive) || it.id == itemId}
+                    .filter { (it.category == category && it.isActive) || it.id == itemId }
 
                 val currentItemIndex = activeItemListWithCurrentItem.indexOf(item)
                 var newCurrentItemIndex = currentItemIndex + if (next) 1 else -1
@@ -178,25 +180,36 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun saveOutfit() {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (!getAllOutfits.value.any { it.itemsInOutfit.sorted() == _uiState.value.currentSelection.sorted() }
-                && _uiState.value.currentSelection.isNotEmpty()) {
-                val newOutfit = Outfit(
-                    id = 0,
-                    itemsInOutfit = _uiState.value.currentSelection
-                )
+    fun saveOutfit(): Boolean? {
+
+
+        if (_uiState.value.currentSelection.isEmpty()) return null
+
+        var flag = false
+
+        if (!getAllOutfits.value.any { it.itemsInOutfit.sorted() == _uiState.value.currentSelection.sorted() }) {
+
+            val newOutfit = Outfit(
+                id = 0,
+                itemsInOutfit = _uiState.value.currentSelection
+            )
+            viewModelScope.launch(Dispatchers.IO) {
                 repository.addOutfit(outfit = newOutfit)
             }
+
+            flag = true
         }
+
+
+
+        return flag
     }
 
     fun updateOutfit(outfit: Outfit) {
         viewModelScope.launch(Dispatchers.IO) {
             if (outfit.itemsInOutfit.isEmpty()) {
                 deleteOutfit(outfit)
-            }
-            else {
+            } else {
                 repository.updateOutfit(outfit)
             }
         }

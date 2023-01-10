@@ -3,8 +3,9 @@ package com.example.wearit.data
 import com.example.wearit.model.Item
 import com.example.wearit.model.Outfit
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class AppRepository(private val itemDao: ItemDao,private val outfitDao: OutfitDao) {
+class AppRepository @Inject constructor(private val itemDao: ItemDao,private val outfitDao: OutfitDao) {
 
     val getAllItems: Flow<List<Item>> = itemDao.getAll()
 

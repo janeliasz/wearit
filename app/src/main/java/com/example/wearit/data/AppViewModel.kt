@@ -1,6 +1,7 @@
 package com.example.wearit.data
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wearit.model.AppUiState
@@ -18,11 +19,11 @@ import kotlin.random.Random
 
 @HiltViewModel
 class AppViewModel @Inject constructor(
-    private val appRepository: AppRepository,
-    private val storeSettings: StoreSettings,
-    private val internalStorageHelper: InternalStorageHelper
+    private val appRepository: IAppRepository,
+    private val storeSettings: IStoreSettings,
+    private val internalStorageHelper: IInternalStorageHelper
 ) : ViewModel() {
-    private val loadedPhotos = internalStorageHelper.loadPhotos().toMutableMap()
+    private var loadedPhotos = internalStorageHelper.loadPhotos().toMutableMap()
 
     val getAllItems: StateFlow<List<Item>> = appRepository.getAllItems.stateIn(
         initialValue = listOf(),
@@ -54,9 +55,16 @@ class AppViewModel @Inject constructor(
     }
 
     fun getItemPhotoByPhotoFilename(filename: String): Bitmap? {
-        return loadedPhotos.entries.find { entry ->
+        val photoByteArray = loadedPhotos.entries.find { entry ->
             entry.key.startsWith(filename)
         }?.value
+
+        return if (photoByteArray != null) {
+            BitmapFactory.decodeByteArray(photoByteArray, 0, photoByteArray.size)
+        }
+        else {
+            null
+        }
     }
 
     fun changeSelectedItem(category: Category, next: Boolean) {
@@ -125,7 +133,8 @@ class AppViewModel @Inject constructor(
                     category = currentCategory
                 )
 
-                loadedPhotos[photoFilename] = bitmap
+                loadedPhotos = internalStorageHelper.loadPhotos().toMutableMap()
+
 
                 appRepository.addItem(item = newItem)
             }

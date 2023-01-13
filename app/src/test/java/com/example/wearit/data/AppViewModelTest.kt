@@ -1,6 +1,6 @@
 package com.example.wearit.data
 
-import org.junit.Assert
+import com.example.wearit.model.Category
 import org.junit.Before
 import org.junit.Test
 
@@ -24,7 +24,9 @@ class AppViewModelTest {
     }
 
     @Test
-    fun `dummy test which should pass`() {
-        Assert.assertEquals(4, 2 + 2)
+    fun `should change current category`() {
+        appViewModel.goToCategory(Category.Tshirt)
+
+        assert(appViewModel.uiState.value.currentCategory == Category.Tshirt)
     }
 }

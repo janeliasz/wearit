@@ -1,57 +1,45 @@
 package com.example.wearit.data
 
-import android.app.Application
 import android.graphics.Bitmap
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wearit.model.AppUiState
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
 import com.example.wearit.model.Outfit
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 import kotlin.collections.set
 import kotlin.random.Random
 
-class AppViewModel(application: Application) : AndroidViewModel(application) {
-    private val internalStorageHelper = InternalStorageHelper(application.applicationContext)
+@HiltViewModel
+class AppViewModel @Inject constructor(
+    private val appRepository: AppRepository,
+    private val storeSettings: StoreSettings,
+    private val internalStorageHelper: InternalStorageHelper
+) : ViewModel() {
     private val loadedPhotos = internalStorageHelper.loadPhotos().toMutableMap()
 
-    private val repository: AppRepository
-    val getAllItems: StateFlow<List<Item>>
-    val getAllOutfits: StateFlow<List<Outfit>>
+    val getAllItems: StateFlow<List<Item>> = appRepository.getAllItems.stateIn(
+        initialValue = listOf(),
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000)
+    )
+    val getAllOutfits: StateFlow<List<Outfit>> = appRepository.getAllOutfits.stateIn(
+        initialValue = listOf(),
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000)
+    )
 
-    private val dataStore: StoreSettings
-    val getIsAppInDarkTheme: StateFlow<Boolean>
-
-    init {
-        val itemDao = AppDatabase.getInstance(application).itemDao()
-        val outfitDao = AppDatabase.getInstance(application).outfitDao()
-
-        repository = AppRepository(itemDao, outfitDao)
-
-        getAllItems = repository.getAllItems.stateIn(
-            initialValue = listOf(),
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000)
-        )
-
-        getAllOutfits = repository.getAllOutfits.stateIn(
-            initialValue = listOf(),
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000)
-        )
-
-        dataStore = StoreSettings(application.applicationContext)
-
-        getIsAppInDarkTheme = dataStore.getIsAppInDarkTheme.stateIn(
-            initialValue = runBlocking { dataStore.getIsAppInDarkTheme.first() },
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000)
-        )
-    }
+    val getIsAppInDarkTheme: StateFlow<Boolean> = storeSettings.getIsAppInDarkTheme.stateIn(
+        initialValue = runBlocking { storeSettings.getIsAppInDarkTheme.first() },
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000)
+    )
 
     private val _uiState = MutableStateFlow(
         AppUiState(
@@ -139,7 +127,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                 loadedPhotos[photoFilename] = bitmap
 
-                repository.addItem(item = newItem)
+                appRepository.addItem(item = newItem)
             }
         }
     }
@@ -150,7 +138,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateItem(item: Item) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateItem(item)
+            appRepository.updateItem(item)
         }
     }
 
@@ -167,7 +155,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
             internalStorageHelper.deleteFile(item.photoFilename)
-            repository.deleteItem(item)
+            appRepository.deleteItem(item)
         }
     }
 
@@ -194,7 +182,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 itemsInOutfit = _uiState.value.currentSelection
             )
             viewModelScope.launch(Dispatchers.IO) {
-                repository.addOutfit(outfit = newOutfit)
+                appRepository.addOutfit(outfit = newOutfit)
             }
 
             flag = true
@@ -210,20 +198,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             if (outfit.itemsInOutfit.isEmpty()) {
                 deleteOutfit(outfit)
             } else {
-                repository.updateOutfit(outfit)
+                appRepository.updateOutfit(outfit)
             }
         }
     }
 
     fun deleteOutfit(outfit: Outfit) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteOutfit(outfit)
+            appRepository.deleteOutfit(outfit)
         }
     }
 
     fun switchTheme(darkMode: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            dataStore.saveIsAppInDarkTheme(darkMode)
+            storeSettings.saveIsAppInDarkTheme(darkMode)
         }
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -34,7 +35,7 @@ enum class WearItScreen() {
 @Preview
 @Composable
 fun WearItApp() {
-    val viewModel = AppViewModel(LocalContext.current.applicationContext as Application)
+    val viewModel: AppViewModel = hiltViewModel<AppViewModel>()
     val uiState by viewModel.uiState.collectAsState()
     val items by viewModel.getAllItems.collectAsState()
     val outfits by viewModel.getAllOutfits.collectAsState()

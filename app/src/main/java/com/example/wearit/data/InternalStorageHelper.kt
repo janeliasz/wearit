@@ -2,12 +2,11 @@ package com.example.wearit.data
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import java.io.IOException
 import java.util.UUID
 
-class InternalStorageHelper(private val context: Context) {
-    fun savePhoto(bitmap: Bitmap): String {
+class InternalStorageHelper(private val context: Context) : IInternalStorageHelper {
+    override fun savePhoto(bitmap: Bitmap): String {
         return try {
             val filename = UUID.randomUUID().toString() + ".png"
             context.openFileOutput(filename, Context.MODE_PRIVATE).use { stream ->
@@ -23,20 +22,19 @@ class InternalStorageHelper(private val context: Context) {
         }
     }
 
-    fun loadPhotos(): Map<String, Bitmap> {
-        val photosMap: MutableMap<String, Bitmap> = mutableMapOf()
+    override fun loadPhotos(): Map<String, ByteArray> {
+        val photosMap: MutableMap<String, ByteArray> = mutableMapOf()
 
         val files = context.filesDir.listFiles()
         files.filter { it.canRead() && it.isFile && it.name.endsWith(".png")}.forEach() {
             val bytes = it.readBytes()
-            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-            photosMap[it.name] = bitmap
+            photosMap[it.name] = bytes
         }
 
         return photosMap
     }
 
-    fun deleteFile(filename: String): Boolean {
+    override fun deleteFile(filename: String): Boolean {
         return try {
             context.deleteFile(filename)
         } catch (e: IOException) {

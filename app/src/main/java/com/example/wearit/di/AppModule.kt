@@ -3,9 +3,7 @@ package com.example.wearit.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
-import com.example.wearit.data.AppDatabase
-import com.example.wearit.data.InternalStorageHelper
-import com.example.wearit.data.StoreSettings
+import com.example.wearit.data.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,9 +35,19 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideStoreSettings(application: Application) = StoreSettings(application.applicationContext)
+    fun provideAppRepository(itemDao: ItemDao, outfitDao: OutfitDao): IAppRepository {
+        return AppRepository(itemDao, outfitDao)
+    }
 
     @Singleton
     @Provides
-    fun provideInternalStorageHelper(application: Application) = InternalStorageHelper(application.applicationContext)
+    fun provideStoreSettings(application: Application): IStoreSettings {
+        return StoreSettings(application.applicationContext)
+    }
+
+    @Singleton
+    @Provides
+    fun provideInternalStorageHelper(application: Application): IInternalStorageHelper {
+        return InternalStorageHelper(application.applicationContext)
+    }
 }

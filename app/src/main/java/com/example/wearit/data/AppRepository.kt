@@ -5,35 +5,36 @@ import com.example.wearit.model.Outfit
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class AppRepository @Inject constructor(private val itemDao: ItemDao,private val outfitDao: OutfitDao) {
+class AppRepository @Inject constructor(private val itemDao: ItemDao, private val outfitDao: OutfitDao) :
+    IAppRepository {
 
-    val getAllItems: Flow<List<Item>> = itemDao.getAll()
+    override val getAllItems: Flow<List<Item>> = itemDao.getAll()
 
-    suspend fun addItem(item: Item) {
+    override suspend fun addItem(item: Item) {
         itemDao.insert(item)
     }
 
-    suspend fun updateItem(item: Item) {
+    override suspend fun updateItem(item: Item) {
         itemDao.update(item)
     }
 
-    suspend fun deleteItem(item: Item) {
+    override suspend fun deleteItem(item: Item) {
         itemDao.delete(item)
     }
 
 
 
-    val getAllOutfits: Flow<List<Outfit>> = outfitDao.getAll()
+    override val getAllOutfits: Flow<List<Outfit>> = outfitDao.getAll()
 
-    suspend fun addOutfit(outfit: Outfit) {
+    override suspend fun addOutfit(outfit: Outfit) {
         outfitDao.insert(outfit)
     }
 
-    suspend fun updateOutfit(outfit: Outfit) {
+    override suspend fun updateOutfit(outfit: Outfit) {
         outfitDao.update(outfit)
     }
 
-    suspend fun deleteOutfit(outfit: Outfit) {
+    override suspend fun deleteOutfit(outfit: Outfit) {
         outfitDao.delete(outfit)
     }
 }

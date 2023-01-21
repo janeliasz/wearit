@@ -1,6 +1,9 @@
 package com.example.wearit.data
 
 import com.example.wearit.model.Category
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
@@ -12,7 +15,7 @@ class AppViewModelTest {
 
     @Before
     fun setUp() {
-        appRepository = FakeAppRepository()
+        appRepository = FakeAppRepository(fakeItems, fakeOutfits)
         storeSettings = FakeStoreSettings()
         internalStorageHelper = FakeInternalStorageHelper()
 
@@ -24,7 +27,45 @@ class AppViewModelTest {
     }
 
     @Test
-    fun `should change current category`() {
+    fun `get item by id`() {
+        val result = appViewModel.getItemById(fakeItems[0].id)
+
+        val expectedItem = fakeItems[0]
+
+        assert(result == expectedItem)
+    }
+
+    @Test
+    fun `return null if no item with id`() {
+        val result = appViewModel.getItemById(0)
+
+        val expectedItem = null
+
+        assert(result == expectedItem)
+    }
+
+    @Test
+    fun `change selected item`() {
+        appViewModel.drawItems()
+
+        val currentItem = appViewModel.uiState.value.currentSelection[0]
+
+        appViewModel.changeSelectedItem(category = Category.Headgear, next = true)
+
+        val newCurrentItem = appViewModel.uiState.value.currentSelection[0]
+
+        assert(newCurrentItem != currentItem)
+    }
+
+    @Test
+    fun `draw items`() {
+        appViewModel.drawItems()
+
+        assert(appViewModel.uiState.value.currentSelection.isNotEmpty())
+    }
+
+    @Test
+    fun `change current category`() {
         appViewModel.goToCategory(Category.Tshirt)
 
         assert(appViewModel.uiState.value.currentCategory == Category.Tshirt)

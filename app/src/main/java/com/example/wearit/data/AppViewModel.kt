@@ -26,12 +26,12 @@ class AppViewModel @Inject constructor(
     private var loadedPhotos = internalStorageHelper.loadPhotos().toMutableMap()
 
     val getAllItems: StateFlow<List<Item>> = appRepository.getAllItems.stateIn(
-        initialValue = listOf(),
+        initialValue = runBlocking { appRepository.getAllItems.first() },
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000)
     )
     val getAllOutfits: StateFlow<List<Outfit>> = appRepository.getAllOutfits.stateIn(
-        initialValue = listOf(),
+        initialValue = runBlocking { appRepository.getAllOutfits.first() },
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000)
     )
@@ -154,10 +154,7 @@ class AppViewModel @Inject constructor(
         }
     }
 
-
     fun saveOutfit(): Boolean? {
-
-
         if (_uiState.value.currentSelection.isEmpty()) return null
 
         var flag = false

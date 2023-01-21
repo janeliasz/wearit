@@ -9,13 +9,13 @@ import com.example.wearit.model.Category
 import com.example.wearit.model.Item
 import com.example.wearit.model.Outfit
 import dagger.hilt.android.lifecycle.HiltViewModel
+import getDrawnItems
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import getNextItem
 import javax.inject.Inject
-import kotlin.collections.set
-import kotlin.random.Random
 
 @HiltViewModel
 class AppViewModel @Inject constructor(
@@ -76,21 +76,7 @@ class AppViewModel @Inject constructor(
             if (item.category != category)
                 itemId
             else {
-                val activeItemListWithCurrentItem = itemList
-                    .filter { (it.category == category && it.isActive) || it.id == itemId }
-
-                val currentItemIndex = activeItemListWithCurrentItem.indexOf(item)
-                var newCurrentItemIndex = currentItemIndex + if (next) 1 else -1
-
-                if (newCurrentItemIndex == activeItemListWithCurrentItem.size)
-                    newCurrentItemIndex = 0
-                else if (newCurrentItemIndex < 0)
-                    newCurrentItemIndex = activeItemListWithCurrentItem.size - 1
-
-                if (activeItemListWithCurrentItem[newCurrentItemIndex].isActive)
-                    activeItemListWithCurrentItem[newCurrentItemIndex].id
-                else
-                    null
+                getNextItem(itemList.filter { it.category == category }, itemId, next)
             }
         }
 
@@ -103,16 +89,8 @@ class AppViewModel @Inject constructor(
 
     fun drawItems() {
         val itemList: List<Item> = getAllItems.value
-        val itemMap: Map<Category, List<Item>> = getItemMap(itemList.sortedBy { it.category })
 
-        val newCurrentSelection = mutableListOf<Int>()
-
-        itemMap.forEach { entry ->
-            val listOfActiveItems = entry.value.filter { it.isActive }
-            if (listOfActiveItems.isNotEmpty()) {
-                newCurrentSelection.add(listOfActiveItems.random().id)
-            }
-        }
+        val newCurrentSelection = getDrawnItems(itemList)
 
         _uiState.update { currentState ->
             currentState.copy(
@@ -224,32 +202,3 @@ class AppViewModel @Inject constructor(
         }
     }
 }
-
-fun getInitialCurrentSelection(items: Map<Category, List<Item>>): List<Int> {
-    val selection = mutableListOf<Int>()
-
-    items.forEach { entry ->
-        val activeItems = entry.value.filter { item -> item.isActive }
-        if (activeItems.isNotEmpty()) {
-            selection.add(activeItems[Random.nextInt(activeItems.size)].id)
-        }
-    }
-
-    return selection
-}
-
-fun getItemMap(itemList: List<Item>): Map<Category, List<Item>> {
-
-    val itemsMap = mutableMapOf<Category, MutableList<Item>>()
-
-    itemList.forEach { item ->
-        if (itemsMap.containsKey(item.category)) {
-            itemsMap.getValue(item.category).add(item)
-        } else {
-            itemsMap[item.category] = mutableListOf(item)
-        }
-    }
-
-    return itemsMap
-}
-

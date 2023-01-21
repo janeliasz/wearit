@@ -49,7 +49,7 @@ val fakeOutfits = mutableListOf<Outfit>(
 
 )
 
-class FakeAppRepository : IAppRepository {
+class FakeAppRepository(private val fakeItems: MutableList<Item>, private val fakeOutfits: MutableList<Outfit>) : IAppRepository {
     override val getAllItems: Flow<List<Item>> = flow {
         emit(fakeItems)
     }

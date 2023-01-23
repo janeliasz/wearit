@@ -32,7 +32,6 @@ enum class WearItScreen() {
     Settings
 }
 
-@Preview
 @Composable
 fun WearItApp() {
     val viewModel: AppViewModel = hiltViewModel<AppViewModel>()

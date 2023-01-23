@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,7 +85,7 @@ fun PickerScreen(
                     contentColor = MaterialTheme.colors.primary,
                     snackbarData = data,
                     shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    modifier = Modifier.padding(horizontal = 20.dp).testTag("snackBarInfo")
                 )
             }
         }
@@ -123,6 +124,7 @@ fun PickerContent(
                 .align(Alignment.CenterHorizontally)
                 .fillMaxSize()
                 .padding(bottom = 75.dp)
+                .testTag("emptySelection")
             ) {
                 Text(text = "You have to draw your items first")
                 GifImage(gif = R.drawable.down, modifier = Modifier
@@ -215,7 +217,7 @@ fun BottomBarPicker(
             MasterButton(
                 onClick = drawSelection,
                 icon = R.drawable.dice,
-                modifier = Modifier.weight(1f, fill = true),
+                modifier = Modifier.weight(1f, fill = true).testTag("drawButton"),
                 text = "DRAW",
                 fontSize = 15.sp
             )
@@ -223,6 +225,7 @@ fun BottomBarPicker(
             MasterButton(
                 type = ButtonType.WHITE,
                 icon = R.drawable.diskette,
+                modifier = Modifier.testTag("saveOutfit"),
                 onClick = {
                     val saved=saveOutfit()
                     var message=""

@@ -16,7 +16,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.example.wearit.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary true
         }
@@ -49,7 +49,6 @@ android {
 }
 
 dependencies {
-
     implementation "io.coil-kt:coil-compose:2.1.0"
     implementation "io.coil-kt:coil-gif:2.1.0"
     implementation "com.google.accompanist:accompanist-pager:0.23.1"
@@ -84,4 +83,26 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:2.40.5"
     kapt "androidx.hilt:hilt-compiler:1.0.0"
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+
+
+    // For Robolectric tests.
+    testImplementation("com.google.dagger:hilt-android-testing:2.44")
+    // ...with Kotlin.
+    kaptTest("com.google.dagger:hilt-android-compiler:2.44")
+    // ...with Java.
+    testAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
+
+
+    // For instrumented tests.
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
+    // ...with Kotlin.
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
+    // ...with Java.
+    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
+
+    implementation "com.google.dagger:hilt-android:2.44"
+    kapt "com.google.dagger:hilt-android-compiler:2.44"
+
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    kapt "androidx.hilt:hilt-compiler:1.0.0"
 }

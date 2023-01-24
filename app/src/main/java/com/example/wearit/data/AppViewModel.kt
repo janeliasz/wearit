@@ -2,9 +2,10 @@ package com.example.wearit.data
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wearit.model.AppUiState
+import com.example.wearit.di.AppUiState
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
 import com.example.wearit.model.Outfit
@@ -43,7 +44,7 @@ class AppViewModel @Inject constructor(
     )
 
     private val _uiState = MutableStateFlow(
-        AppUiState(
+        com.example.wearit.di.AppUiState(
             currentSelection = listOf()
         )
     )
@@ -59,13 +60,13 @@ class AppViewModel @Inject constructor(
             val photoByteArray = loadedPhotos.entries.find { entry ->
                 entry.key.startsWith(filename)
             }?.value
-
             if (photoByteArray != null) {
                 BitmapFactory.decodeByteArray(photoByteArray, 0, photoByteArray.size)
-            } else {git
+            } else {
                 null
             }
         }catch (_:java.lang.NullPointerException){
+
             null
         }
     }
@@ -92,7 +93,6 @@ class AppViewModel @Inject constructor(
 
     fun drawItems() {
         val itemList: List<Item> = getAllItems.value
-
         val newCurrentSelection = getDrawnItems(itemList)
 
         _uiState.update { currentState ->

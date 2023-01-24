@@ -144,7 +144,7 @@ fun PickerContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 10.dp, bottom = 80.dp),
+                .padding(top = 10.dp, bottom = 80.dp).testTag("items"),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(currentSelection) { item ->

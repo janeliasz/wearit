@@ -55,14 +55,17 @@ class AppViewModel @Inject constructor(
     }
 
     fun getItemPhotoByPhotoFilename(filename: String): Bitmap? {
-        val photoByteArray = loadedPhotos.entries.find { entry ->
-            entry.key.startsWith(filename)
-        }?.value
+        return try{
+            val photoByteArray = loadedPhotos.entries.find { entry ->
+                entry.key.startsWith(filename)
+            }?.value
 
-        return if (photoByteArray != null) {
-            BitmapFactory.decodeByteArray(photoByteArray, 0, photoByteArray.size)
-        }
-        else {
+            if (photoByteArray != null) {
+                BitmapFactory.decodeByteArray(photoByteArray, 0, photoByteArray.size)
+            } else {git
+                null
+            }
+        }catch (_:java.lang.NullPointerException){
             null
         }
     }

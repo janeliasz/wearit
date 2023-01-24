@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PickerScreen(
     goToWardrobe: () -> Unit,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     currentSelection: List<Item>,
     changeSelectedItem: (category: Category, next: Boolean) -> Unit,
     drawSelection: () -> Unit,
@@ -85,7 +85,9 @@ fun PickerScreen(
                     contentColor = MaterialTheme.colors.primary,
                     snackbarData = data,
                     shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier.padding(horizontal = 20.dp).testTag("snackBarInfo")
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .testTag("snackBarInfo")
                 )
             }
         }
@@ -96,7 +98,7 @@ fun PickerScreen(
 
 @Composable
 fun PickerContent(
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     currentSelection: List<Item>,
     changeSelectedItem: (category: Category, next: Boolean) -> Unit,
     goToSettings: () -> Unit
@@ -111,12 +113,16 @@ fun PickerContent(
             Image(
                 painter = painterResource(id = R.drawable.wearit),
                 contentDescription = "Logo text",
-                modifier = Modifier.align(Alignment.TopCenter).size(150.dp,50.dp),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .size(150.dp, 50.dp),
                 contentScale = ContentScale.Fit
 
             )
 
-            GifImage(gif = R.drawable.settings, modifier = Modifier.size(50.dp).align(Alignment.TopEnd), onClick = goToSettings)
+            GifImage(gif = R.drawable.settings, modifier = Modifier
+                .size(50.dp)
+                .align(Alignment.TopEnd), onClick = goToSettings)
         }
 
         if (currentSelection.isEmpty()) {
@@ -174,12 +180,18 @@ fun PickerContent(
                                 shape = RoundedCornerShape(50.dp)
                             )
                     ) {
-                        Image(
-                            bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
-                            contentDescription = item.name,
-                            modifier = Modifier.padding(20.dp),
-                            contentScale = ContentScale.Fit
-                        )
+                        val bitmap = getItemPhotoByPhotoFilename(item.photoFilename)
+
+                        if(bitmap == null){
+                            Text(text = "No item found", modifier = Modifier.testTag("error"))
+                        }else{
+                            Image(
+                                bitmap = bitmap.asImageBitmap(),
+                                contentDescription = item.name,
+                                modifier = Modifier.padding(20.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
                     }
 
                     GifImage(
@@ -217,7 +229,9 @@ fun BottomBarPicker(
             MasterButton(
                 onClick = drawSelection,
                 icon = R.drawable.dice,
-                modifier = Modifier.weight(1f, fill = true).testTag("drawButton"),
+                modifier = Modifier
+                    .weight(1f, fill = true)
+                    .testTag("drawButton"),
                 text = "DRAW",
                 fontSize = 15.sp
             )
@@ -281,7 +295,9 @@ fun GifImage(
             imageLoader = imageLoader,
         ),
         contentDescription = null,
-        modifier = modifier.fillMaxWidth().clickable{onClick()},
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         contentScale = ContentScale.Fit
     )
 }

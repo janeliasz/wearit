@@ -67,7 +67,7 @@ class PickerScreenTest{
 
         composeRule.setContent {
             val navController = rememberNavController()
-            hiltRule.
+            val viewModel: AppViewModel = hiltViewModel()
 
             WearItTheme {
                 NavHost(

@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.core.app.ApplicationProvider
 import com.example.wearit.MainActivity
 import com.example.wearit.WearItApp
+import com.example.wearit.WearItApplication
 import com.example.wearit.WearItScreen
 import com.example.wearit.data.*
 import com.example.wearit.di.AppModule
@@ -47,7 +48,7 @@ class PickerScreenTest{
     private lateinit var repository: IAppRepository
     private lateinit var internalStorageHelper: IInternalStorageHelper
     private lateinit var storeSettings: IStoreSettings
-
+    private lateinit  var app: Application
     @get:Rule(order=0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -58,16 +59,19 @@ class PickerScreenTest{
     @Before()
     fun setUp(){
         hiltRule.inject()
-
+        app = WearItApplication()
         database = TestAppModule.provideAppDatabase(ApplicationProvider.getApplicationContext())
         itemDao = TestAppModule.provideItemDao(database)
         outfitDao = TestAppModule.provideOutfitDao(database)
-        repository = TestAppModule.provideAppRepository(itemDao,outfitDao)
         insertItems()
+
+        repository = TestAppModule.provideAppRepository(itemDao,outfitDao)
+        storeSettings = TestAppModule.provideStoreSettings(app)
+        internalStorageHelper = TestAppModule.provideInternalStorageHelper(app)
 
         composeRule.setContent {
             val navController = rememberNavController()
-            val viewModel: AppViewModel = hiltViewModel()
+            val viewModel = AppViewModel(repository,storeSettings,internalStorageHelper)
 
             WearItTheme {
                 NavHost(
@@ -145,11 +149,11 @@ class PickerScreenTest{
     }
 
     @Test
-    fun snackbarAfterClickingDraw_displayed_selectionNotEmpty(){
+    fun snackbarAfterClickingDraw_displayed_selectionEmpty(){
         composeRule.onNodeWithTag("snackBarInfo").assertDoesNotExist()
         composeRule.onNodeWithTag("saveOutfit").performClick()
         composeRule.onNodeWithTag("snackBarInfo").assertIsDisplayed()
-        composeRule.onNodeWithTag("snackBarInfo").assertExists().onChild().assertTextEquals("Outfit saved properly")
+        composeRule.onNodeWithTag("snackBarInfo").assertExists().onChild().assertTextEquals("Outfit can't be empty")
     }
 
     @Test

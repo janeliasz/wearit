@@ -22,6 +22,21 @@ class InternalStorageHelper(private val context: Context) : IInternalStorageHelp
         }
     }
 
+    fun savePhoto(bitmap: Bitmap, filename: String, ctx: Context): String {
+        return try {
+            ctx.openFileOutput(filename, Context.MODE_PRIVATE).use { stream ->
+                bitmap.setHasAlpha(true)
+                if(!bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)) {
+                    throw IOException("Could not save photo.")
+                }
+            }
+            filename
+        } catch(e: IOException) {
+            e.printStackTrace()
+            ""
+        }
+    }
+
     override fun loadPhotos(): Map<String, ByteArray> {
         val photosMap: MutableMap<String, ByteArray> = mutableMapOf()
 

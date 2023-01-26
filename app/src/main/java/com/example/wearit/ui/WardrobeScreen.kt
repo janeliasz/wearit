@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -245,6 +246,7 @@ fun WardrobeListOfItemsFromCurrentCategory(
                         deleteItem = deleteItem,
                         editing = editing,
                         goToSingleItem = goToSingleItem,
+                        modifier = Modifier.testTag("item-"+item.id)
 
                     )
                 }
@@ -263,8 +265,8 @@ fun SingleClothItem(
     setActiveInactive: (item: Item) -> Unit,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
-    goToSingleItem: (itemId: Int) -> Unit
-
+    goToSingleItem: (itemId: Int) -> Unit,
+    modifier: Modifier
     ) {
 
 
@@ -303,7 +305,7 @@ fun SingleClothItem(
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .padding(0.dp,5.dp)
     ) {
 
@@ -350,9 +352,10 @@ fun SingleClothItem(
 
 
                 ) {
-
+                val bm = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap()
+                Log.d("bitmap: ", bm.toString())
                 Image(
-                    bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
+                    bitmap = bm,
                     contentDescription = item.name,
                     modifier = Modifier
                         .size(120.dp)

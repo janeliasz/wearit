@@ -2,33 +2,30 @@ package com.example.wearit.ui
 
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
-
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.test.core.app.ApplicationProvider
+import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wearit.MainActivity
 import com.example.wearit.WearItScreen
 import com.example.wearit.data.*
 import com.example.wearit.di.AppModule
 import com.example.wearit.data.AppViewModel
-import com.example.wearit.model.Category
-import com.example.wearit.model.Item
 import com.example.wearit.ui.theme.WearItTheme
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
-import okhttp3.internal.notifyAll
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import com.example.wearit.R
+import javax.inject.Inject
+
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
@@ -40,9 +37,15 @@ class PickerScreenTest{
     @get:Rule(order=1)
     val composeRule = createAndroidComposeRule<MainActivity>()
 
+    val internalStorageHelper = InternalStorageHelper(InstrumentationRegistry.getInstrumentation().targetContext)
+
     @SuppressLint("StateFlowValueCalledInComposition")
     @Before
     fun setUp(){
+
+        val testItemBitmap = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.cargos);
+        println("filename: "+internalStorageHelper.savePhoto(testItemBitmap, "cargos.png", InstrumentationRegistry.getInstrumentation().targetContext))
+
         hiltRule.inject()
         composeRule.setContent {
             val navController = rememberNavController()

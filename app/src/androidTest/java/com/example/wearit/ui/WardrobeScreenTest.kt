@@ -46,11 +46,11 @@ class WardrobeScreenTest{
     @Before
     fun setUp(){
         val testItem1 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_1)
-        println("filename: "+internalStorageHelper.savePhoto(testItem1, "testItem1.png"))
+        "filename: "+internalStorageHelper.savePhoto(testItem1, "testItem1.png")
         val testItem2 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_2)
-        println("filename: "+internalStorageHelper.savePhoto(testItem2, "testItem2.png"))
+        "filename: "+internalStorageHelper.savePhoto(testItem2, "testItem2.png")
         val testItem3 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_3)
-        println("filename: "+internalStorageHelper.savePhoto(testItem3, "testItem3.png"))
+        "filename: "+internalStorageHelper.savePhoto(testItem3, "testItem3.png")
 
         Awaitility.setDefaultPollInterval(500, TimeUnit.MILLISECONDS)
 
@@ -58,15 +58,8 @@ class WardrobeScreenTest{
         composeRule.setContent {
             val navController = rememberNavController()
             val viewModel =  hiltViewModel<AppViewModel>()
+            val uiState by viewModel.uiState.collectAsState()
             val items by viewModel.getAllItems.collectAsState()
-
-            Log.d("size of items",viewModel.getAllItems.value.size.toString())
-            Log.d("item: ",viewModel.getAllItems.value[0].id.toString())
-            Log.d("item: ",viewModel.getAllItems.value[0].name)
-            Log.d("item: ",viewModel.getAllItems.value[0].photoFilename)
-            Log.d("item: ",viewModel.getAllItems.value[0].category.toString())
-            Log.d("item: ",viewModel.getAllItems.value[0].isActive.toString())
-            Log.d("items of  current category: ", items.filter { item -> item.category == viewModel.uiState.value.currentCategory }.size.toString())
 
             WearItTheme {
                 NavHost(
@@ -79,7 +72,7 @@ class WardrobeScreenTest{
                         WardrobeScreen(
                             onCategoryChange = { viewModel.goToCategory(it) },
                             goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
-                            itemsOfCurrentCategory = items.filter { item -> item.category == viewModel.uiState.value.currentCategory },
+                            itemsOfCurrentCategory = items.filter { item -> item.category == uiState.currentCategory },
                             saveItem = { bitmap -> viewModel.saveItem("test", bitmap) },
                             getItemPhotoByPhotoFilename = { itemId ->
                                 viewModel.getItemPhotoByPhotoFilename(
@@ -87,7 +80,7 @@ class WardrobeScreenTest{
                                 )
                             },
                             setActiveInactive = { viewModel.setItemActiveInactive(it) },
-                            currentCategory = viewModel.uiState.value.currentCategory,
+                            currentCategory = uiState.currentCategory,
                             goToSingleItem = { itemId -> navController.navigate(WearItScreen.ItemInfo.name+"/${itemId}")},
                             goToFavorites = { navController.navigate(WearItScreen.Favorites.name)},
                             deleteItem = { viewModel.deleteItem(it) }
@@ -118,7 +111,7 @@ class WardrobeScreenTest{
     fun clickEdit_deleteButtonVisible() {
         composeRule.onNodeWithText("EDIT").performClick()
 
-//        composeRule.onNodeWithTag("testItem1-delete").assertExists()
+        composeRule.onNodeWithTag("testItem1-delete").assertExists()
     }
 
 

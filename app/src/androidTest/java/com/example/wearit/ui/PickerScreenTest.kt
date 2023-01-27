@@ -45,11 +45,11 @@ class PickerScreenTest{
     @Before
     fun setUp(){
         val testItem1 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_1)
-        println("filename: "+internalStorageHelper.savePhoto(testItem1, "testItem1.png"))
+        "filename: "+internalStorageHelper.savePhoto(testItem1, "testItem1.png")
         val testItem2 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_2)
-        println("filename: "+internalStorageHelper.savePhoto(testItem2, "testItem2.png"))
+        "filename: "+internalStorageHelper.savePhoto(testItem2, "testItem2.png")
         val testItem3 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_3)
-        println("filename: "+internalStorageHelper.savePhoto(testItem3, "testItem3.png"))
+        "filename: "+internalStorageHelper.savePhoto(testItem3, "testItem3.png")
 
         Awaitility.setDefaultPollInterval(500, TimeUnit.MILLISECONDS)
 
@@ -57,8 +57,6 @@ class PickerScreenTest{
         composeRule.setContent {
             val navController = rememberNavController()
             val viewModel =  hiltViewModel<AppViewModel>()
-
-            Log.d("size of items",viewModel.getAllItems.value.size.toString())
 
             WearItTheme {
                 NavHost(
@@ -109,7 +107,7 @@ class PickerScreenTest{
     @Test
     fun clickingDraw_emptySelection_nothing(){
         composeRule.onNodeWithTag("drawButton").performClick()
-        composeRule.onNodeWithTag("error").assertDoesNotExist()
+        composeRule.onNodeWithText("You have to draw your items first").assertExists()
     }
 
 

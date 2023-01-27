@@ -22,9 +22,9 @@ class InternalStorageHelper(private val context: Context) : IInternalStorageHelp
         }
     }
 
-    fun savePhoto(bitmap: Bitmap, filename: String, ctx: Context): String {
+    fun savePhoto(bitmap: Bitmap, filename: String): String {
         return try {
-            ctx.openFileOutput(filename, Context.MODE_PRIVATE).use { stream ->
+            context.openFileOutput(filename, Context.MODE_PRIVATE).use { stream ->
                 bitmap.setHasAlpha(true)
                 if(!bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)) {
                     throw IOException("Could not save photo.")

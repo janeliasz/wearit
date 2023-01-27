@@ -52,7 +52,7 @@ fun WardrobeScreen(
     onCategoryChange: (category: Category) -> Unit,
     itemsOfCurrentCategory: List<Item>?,
     saveItem: (bitmap: Bitmap) -> Unit,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
@@ -94,7 +94,7 @@ fun WardrobePageContent(
     listOfCategories: List<Category>,
     itemsOfCurrentCategory: List<Item>?,
     saveItem: (bitmap: Bitmap) -> Unit,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
@@ -138,7 +138,7 @@ fun WardrobeClothesListSection(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
     itemsOfCurrentCategory: List<Item>?,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
@@ -218,7 +218,7 @@ fun WardrobeListOfCategories(
 @Composable
 fun WardrobeListOfItemsFromCurrentCategory(
     itemsOfCurrentCategory: List<Item>?,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     setActiveInactive: (item: Item) -> Unit,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
@@ -246,7 +246,7 @@ fun WardrobeListOfItemsFromCurrentCategory(
                         deleteItem = deleteItem,
                         editing = editing,
                         goToSingleItem = goToSingleItem,
-                        modifier = Modifier.testTag("item-"+item.id)
+                        modifier = Modifier.testTag("testItem"+item.id)
 
                     )
                 }
@@ -261,7 +261,7 @@ fun WardrobeListOfItemsFromCurrentCategory(
 @Composable
 fun SingleClothItem(
     item: Item,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     setActiveInactive: (item: Item) -> Unit,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
@@ -321,7 +321,7 @@ fun SingleClothItem(
         ImageIcon(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .testTag("item-"+item.id+"-delete"),
+                .testTag("testItem"+item.id+"-delete"),
             tickOpacity = deleteOpacity,
             size = 30.dp,
             icon = R.drawable.close,
@@ -353,20 +353,19 @@ fun SingleClothItem(
 
 
                 ) {
-                val bm = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap()
-                Log.d("bitmap: ", bm.toString())
-                Image(
-                    bitmap = bm,
-                    contentDescription = item.name,
-                    modifier = Modifier
-                        .size(120.dp)
-                        .alpha(itemOpacity)
-                )
-//                Text(
-//                    text = item.name, textAlign = TextAlign.Center, modifier = Modifier
-//                        .padding(5.dp, 0.dp, 5.dp, 10.dp)
-//
-//                )
+                val bm = getItemPhotoByPhotoFilename(item.photoFilename)?.asImageBitmap()
+                if (bm != null) {
+                    Image(
+                        bitmap = bm,
+                        contentDescription = item.name,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .alpha(itemOpacity)
+                    )
+                }
+                else {
+                    Text("Could not load the photo")
+                }
             }
         }
     }

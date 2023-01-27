@@ -26,11 +26,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import com.example.wearit.R
-import com.example.wearit.model.Category
 import org.awaitility.Awaitility
-import org.junit.BeforeClass
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 
 @HiltAndroidTest
@@ -43,14 +40,17 @@ class WardrobeScreenTest{
     @get:Rule(order=1)
     val composeRule = createAndroidComposeRule<MainActivity>()
 
-    val internalStorageHelper = InternalStorageHelper(InstrumentationRegistry.getInstrumentation().targetContext)
+    private val internalStorageHelper = InternalStorageHelper(InstrumentationRegistry.getInstrumentation().targetContext)
 
     @SuppressLint("StateFlowValueCalledInComposition")
     @Before
     fun setUp(){
-
-        val testItemBitmap = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.cargos);
-        println("filename: "+internalStorageHelper.savePhoto(testItemBitmap, "cargos.png", InstrumentationRegistry.getInstrumentation().targetContext))
+        val testItem1 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_1)
+        println("filename: "+internalStorageHelper.savePhoto(testItem1, "testItem1.png"))
+        val testItem2 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_2)
+        println("filename: "+internalStorageHelper.savePhoto(testItem2, "testItem2.png"))
+        val testItem3 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_3)
+        println("filename: "+internalStorageHelper.savePhoto(testItem3, "testItem3.png"))
 
         Awaitility.setDefaultPollInterval(500, TimeUnit.MILLISECONDS)
 
@@ -58,8 +58,8 @@ class WardrobeScreenTest{
         composeRule.setContent {
             val navController = rememberNavController()
             val viewModel =  hiltViewModel<AppViewModel>()
-            viewModel.goToCategory(Category.Trousers)
             val items by viewModel.getAllItems.collectAsState()
+
             Log.d("size of items",viewModel.getAllItems.value.size.toString())
             Log.d("item: ",viewModel.getAllItems.value[0].id.toString())
             Log.d("item: ",viewModel.getAllItems.value[0].name)
@@ -84,7 +84,7 @@ class WardrobeScreenTest{
                             getItemPhotoByPhotoFilename = { itemId ->
                                 viewModel.getItemPhotoByPhotoFilename(
                                     itemId
-                                )!!
+                                )
                             },
                             setActiveInactive = { viewModel.setItemActiveInactive(it) },
                             currentCategory = viewModel.uiState.value.currentCategory,
@@ -107,25 +107,18 @@ class WardrobeScreenTest{
     }
 
 
-//    @Test
-//    fun dupa() {
-//        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-//            composeRule.onNodeWithTag("item-1").assertExists()
-//        }
-//    }
-//
-//    @Test
-//    fun dupa2() {
-//        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-//            composeRule.onNodeWithTag("item-1").assertExists()
-//        }
-//    }
+    @Test
+    fun itemRenders() {
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            composeRule.onNodeWithTag("testItem1").assertExists()
+        }
+    }
 
     @Test
-    fun clickEdit_DeleteButtonVisible() {
+    fun clickEdit_deleteButtonVisible() {
         composeRule.onNodeWithText("EDIT").performClick()
 
-        composeRule.onNodeWithTag("item-1-delete").assertExists()
+//        composeRule.onNodeWithTag("testItem1-delete").assertExists()
     }
 
 

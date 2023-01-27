@@ -24,6 +24,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import com.example.wearit.R
+import org.awaitility.Awaitility
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -37,14 +39,19 @@ class PickerScreenTest{
     @get:Rule(order=1)
     val composeRule = createAndroidComposeRule<MainActivity>()
 
-    val internalStorageHelper = InternalStorageHelper(InstrumentationRegistry.getInstrumentation().targetContext)
+    private val internalStorageHelper = InternalStorageHelper(InstrumentationRegistry.getInstrumentation().targetContext)
 
     @SuppressLint("StateFlowValueCalledInComposition")
     @Before
     fun setUp(){
+        val testItem1 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_1)
+        println("filename: "+internalStorageHelper.savePhoto(testItem1, "testItem1.png"))
+        val testItem2 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_2)
+        println("filename: "+internalStorageHelper.savePhoto(testItem2, "testItem2.png"))
+        val testItem3 = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.test_item_3)
+        println("filename: "+internalStorageHelper.savePhoto(testItem3, "testItem3.png"))
 
-        val testItemBitmap = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.cargos);
-        println("filename: "+internalStorageHelper.savePhoto(testItemBitmap, "cargos.png", InstrumentationRegistry.getInstrumentation().targetContext))
+        Awaitility.setDefaultPollInterval(500, TimeUnit.MILLISECONDS)
 
         hiltRule.inject()
         composeRule.setContent {

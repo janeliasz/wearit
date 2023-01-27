@@ -1,14 +1,12 @@
-package com.example.wearit.data
+package com.example.wearit.model
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wearit.di.AppUiState
-import com.example.wearit.model.Category
-import com.example.wearit.model.Item
-import com.example.wearit.model.Outfit
+import com.example.wearit.data.IAppRepository
+import com.example.wearit.data.IInternalStorageHelper
+import com.example.wearit.data.IStoreSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import getDrawnItems
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +42,7 @@ class AppViewModel @Inject constructor(
     )
 
     private val _uiState = MutableStateFlow(
-        com.example.wearit.di.AppUiState(
+        AppUiState(
             currentSelection = listOf()
         )
     )
@@ -56,17 +54,13 @@ class AppViewModel @Inject constructor(
     }
 
     fun getItemPhotoByPhotoFilename(filename: String): Bitmap? {
-        return try{
-            val photoByteArray = loadedPhotos.entries.find { entry ->
-                entry.key.startsWith(filename)
-            }?.value
-            if (photoByteArray != null) {
-                BitmapFactory.decodeByteArray(photoByteArray, 0, photoByteArray.size)
-            } else {
-                null
-            }
-        }catch (_:java.lang.NullPointerException){
-
+        val photoByteArray = loadedPhotos.entries.find { entry ->
+            entry.key.startsWith(filename)
+        }?.value
+        return if (photoByteArray != null) {
+            BitmapFactory.decodeByteArray(photoByteArray, 0, photoByteArray.size)
+        }
+        else {
             null
         }
     }

@@ -2,6 +2,7 @@ package com.example.wearit.ui
 
 import android.graphics.Bitmap
 import android.os.Build.VERSION.SDK_INT
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -124,6 +125,7 @@ fun PickerContent(
                 .size(50.dp)
                 .align(Alignment.TopEnd), onClick = goToSettings)
         }
+        Log.d("currentSelection: ", currentSelection.size.toString())
 
         if (currentSelection.isEmpty()) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier
@@ -139,72 +141,72 @@ fun PickerContent(
             }
 
         }
+        else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp, bottom = 80.dp).testTag("items"),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(currentSelection) { item ->
 
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp, bottom = 80.dp).testTag("items"),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(currentSelection) { item ->
-
-                Row(
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-
-                    GifImage(
-                        gif = R.drawable.left,
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .padding(10.dp)
-                            .weight(0.2f, fill = true),
-                        onClick= { changeSelectedItem(item.category, false) }
-                    )
-
-
-                    Box(
-                        contentAlignment = Alignment.Center,
+                    Row(
                         modifier = Modifier
                             .padding(10.dp)
-                            .clip(shape = RoundedCornerShape(50.dp))
-                            .align(Alignment.CenterVertically)
-                            .weight(0.6f, fill = true)
-                            .height(300.dp)
-                            .border(
-                                width = 5.dp,
-                                color = MaterialTheme.colors.primary.copy(alpha = LocalContentAlpha.current),
-                                shape = RoundedCornerShape(50.dp)
-                            )
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        val bitmap = getItemPhotoByPhotoFilename(item.photoFilename)
 
-                        if(bitmap == null){
-                            Text(text = "No item found", modifier = Modifier.testTag("error"))
-                        }else{
-                            Image(
-                                bitmap = bitmap.asImageBitmap(),
-                                contentDescription = item.name,
-                                modifier = Modifier.padding(20.dp),
-                                contentScale = ContentScale.Fit
-                            )
+                        GifImage(
+                            gif = R.drawable.left,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(10.dp)
+                                .weight(0.2f, fill = true),
+                            onClick= { changeSelectedItem(item.category, false) }
+                        )
+
+
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .clip(shape = RoundedCornerShape(50.dp))
+                                .align(Alignment.CenterVertically)
+                                .weight(0.6f, fill = true)
+                                .height(300.dp)
+                                .border(
+                                    width = 5.dp,
+                                    color = MaterialTheme.colors.primary.copy(alpha = LocalContentAlpha.current),
+                                    shape = RoundedCornerShape(50.dp)
+                                )
+                        ) {
+                            val bitmap = getItemPhotoByPhotoFilename(item.photoFilename)
+
+                            if(bitmap == null){
+                                Text(text = "No item found", modifier = Modifier.testTag("error"))
+                            }else{
+                                Image(
+                                    bitmap = bitmap.asImageBitmap(),
+                                    contentDescription = item.name,
+                                    modifier = Modifier.padding(20.dp),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
                         }
+
+                        GifImage(
+                            gif = R.drawable.right,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(10.dp)
+                                .weight(0.2f, fill = true),
+                            onClick= { changeSelectedItem(item.category, false) }
+
+                        )
+
+
                     }
-
-                    GifImage(
-                        gif = R.drawable.right,
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .padding(10.dp)
-                            .weight(0.2f, fill = true),
-                        onClick= { changeSelectedItem(item.category, false) }
-
-                    )
-
-
                 }
             }
         }

@@ -3,7 +3,6 @@ package com.example.wearit.ui
 
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -15,7 +14,6 @@ import com.example.wearit.MainActivity
 import com.example.wearit.WearItScreen
 import com.example.wearit.data.*
 import com.example.wearit.di.AppModule
-import com.example.wearit.data.AppViewModel
 import com.example.wearit.ui.theme.WearItTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -24,10 +22,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import com.example.wearit.R
+import com.example.wearit.model.AppViewModel
 import org.awaitility.Awaitility
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)

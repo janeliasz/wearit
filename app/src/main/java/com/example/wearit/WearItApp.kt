@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.example.wearit.data.AppViewModel
+import com.example.wearit.model.AppViewModel
 import com.example.wearit.ui.FavoritesScreen
 import com.example.wearit.ui.PickerScreen
 import com.example.wearit.ui.WardrobeScreen
@@ -63,8 +63,9 @@ fun WearItApp() {
                     )
                 },
                 drawSelection = { viewModel.drawItems() },
-                saveOutfit = { viewModel.saveOutfit() }
-            ) { navController.navigate(WearItScreen.Settings.name) }
+                saveOutfit = { viewModel.saveOutfit() },
+                goToSettings = { navController.navigate(WearItScreen.Settings.name) }
+            )
         }
 
         composable(WearItScreen.Wardrobe.name) {

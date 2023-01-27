@@ -3,9 +3,6 @@ package com.example.wearit.ui
 
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
-import android.util.Log
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -17,7 +14,7 @@ import com.example.wearit.MainActivity
 import com.example.wearit.WearItScreen
 import com.example.wearit.data.*
 import com.example.wearit.di.AppModule
-import com.example.wearit.data.AppViewModel
+import com.example.wearit.model.AppViewModel
 import com.example.wearit.ui.theme.WearItTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -58,8 +55,6 @@ class WardrobeScreenTest{
         composeRule.setContent {
             val navController = rememberNavController()
             val viewModel =  hiltViewModel<AppViewModel>()
-            val uiState by viewModel.uiState.collectAsState()
-            val items by viewModel.getAllItems.collectAsState()
 
             WearItTheme {
                 NavHost(
@@ -72,7 +67,7 @@ class WardrobeScreenTest{
                         WardrobeScreen(
                             onCategoryChange = { viewModel.goToCategory(it) },
                             goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
-                            itemsOfCurrentCategory = items.filter { item -> item.category == uiState.currentCategory },
+                            itemsOfCurrentCategory = viewModel.getAllItems.value.filter { item -> item.category == viewModel.uiState.value.currentCategory },
                             saveItem = { bitmap -> viewModel.saveItem("test", bitmap) },
                             getItemPhotoByPhotoFilename = { itemId ->
                                 viewModel.getItemPhotoByPhotoFilename(
@@ -80,7 +75,7 @@ class WardrobeScreenTest{
                                 )
                             },
                             setActiveInactive = { viewModel.setItemActiveInactive(it) },
-                            currentCategory = uiState.currentCategory,
+                            currentCategory = viewModel.uiState.value.currentCategory,
                             goToSingleItem = { itemId -> navController.navigate(WearItScreen.ItemInfo.name+"/${itemId}")},
                             goToFavorites = { navController.navigate(WearItScreen.Favorites.name)},
                             deleteItem = { viewModel.deleteItem(it) }

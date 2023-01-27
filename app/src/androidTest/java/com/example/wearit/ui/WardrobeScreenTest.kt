@@ -4,6 +4,8 @@ package com.example.wearit.ui
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,12 +28,11 @@ import org.junit.Test
 import com.example.wearit.R
 import org.awaitility.Awaitility
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
-class PickerScreenTest{
+class WardrobeScreenTest{
 
     @get:Rule(order=0)
     val hiltRule = HiltAndroidRule(this)
@@ -57,38 +58,33 @@ class PickerScreenTest{
         composeRule.setContent {
             val navController = rememberNavController()
             val viewModel =  hiltViewModel<AppViewModel>()
+            val uiState by viewModel.uiState.collectAsState()
+            val items by viewModel.getAllItems.collectAsState()
 
             WearItTheme {
                 NavHost(
                     navController = navController,
-                    startDestination = WearItScreen.Picker.name
+                    startDestination = WearItScreen.Wardrobe.name
                 ) {
 
 
-                    composable(WearItScreen.Picker.name) {
-                        PickerScreen(
-                            goToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
+                    composable(WearItScreen.Wardrobe.name) {
+                        WardrobeScreen(
+                            onCategoryChange = { viewModel.goToCategory(it) },
+                            goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
+                            itemsOfCurrentCategory = items.filter { item -> item.category == uiState.currentCategory },
+                            saveItem = { bitmap -> viewModel.saveItem("test", bitmap) },
                             getItemPhotoByPhotoFilename = { itemId ->
                                 viewModel.getItemPhotoByPhotoFilename(
                                     itemId
                                 )
                             },
-                            currentSelection = viewModel.uiState.value.currentSelection.mapNotNull {
-                                    itemId ->
-                                viewModel.getItemById(
-                                    itemId
-                                )
-                            }
-                            ,
-                            changeSelectedItem = { category, next ->
-                                viewModel.changeSelectedItem(
-                                    category,
-                                    next
-                                )
-                            },
-                            drawSelection = { viewModel.drawItems() },
-                            saveOutfit = { viewModel.saveOutfit() }
-                        ) { navController.navigate(WearItScreen.Settings.name) }
+                            setActiveInactive = { viewModel.setItemActiveInactive(it) },
+                            currentCategory = uiState.currentCategory,
+                            goToSingleItem = { itemId -> navController.navigate(WearItScreen.ItemInfo.name+"/${itemId}")},
+                            goToFavorites = { navController.navigate(WearItScreen.Favorites.name)},
+                            deleteItem = { viewModel.deleteItem(it) }
+                        )
                     }
 
                 }
@@ -105,17 +101,20 @@ class PickerScreenTest{
 
 
     @Test
-    fun clickingDraw_emptySelection_nothing(){
-        composeRule.onNodeWithTag("drawButton").performClick()
-        composeRule.onNodeWithText("You have to draw your items first").assertExists()
+    fun itemRenders() {
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            composeRule.onNodeWithTag("testItem1").assertExists()
+        }
     }
-
 
     @Test
-    fun clickingSave_emptySelection_SnackBar(){
-        composeRule.onNodeWithTag("saveOutfit").performClick()
-        composeRule.onNodeWithTag("snackBarInfo").onChild().assertTextEquals("Outfit can't be empty")
+    fun clickEdit_deleteButtonVisible() {
+        composeRule.onNodeWithText("EDIT").performClick()
+
+        composeRule.onNodeWithTag("testItem1-delete").assertExists()
     }
+
+
 
 
 }

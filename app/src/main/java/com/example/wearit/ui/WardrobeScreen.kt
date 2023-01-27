@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,7 +52,7 @@ fun WardrobeScreen(
     onCategoryChange: (category: Category) -> Unit,
     itemsOfCurrentCategory: List<Item>?,
     saveItem: (bitmap: Bitmap) -> Unit,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
@@ -93,7 +94,7 @@ fun WardrobePageContent(
     listOfCategories: List<Category>,
     itemsOfCurrentCategory: List<Item>?,
     saveItem: (bitmap: Bitmap) -> Unit,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
@@ -137,7 +138,7 @@ fun WardrobeClothesListSection(
     onCategoryChange: (category: Category) -> Unit,
     listOfCategories: List<Category>,
     itemsOfCurrentCategory: List<Item>?,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     setActiveInactive: (item: Item) -> Unit,
     currentCategory: Category,
     deleteItem: (item: Item) -> Unit,
@@ -217,7 +218,7 @@ fun WardrobeListOfCategories(
 @Composable
 fun WardrobeListOfItemsFromCurrentCategory(
     itemsOfCurrentCategory: List<Item>?,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     setActiveInactive: (item: Item) -> Unit,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
@@ -245,6 +246,7 @@ fun WardrobeListOfItemsFromCurrentCategory(
                         deleteItem = deleteItem,
                         editing = editing,
                         goToSingleItem = goToSingleItem,
+                        modifier = Modifier.testTag("testItem"+item.id)
 
                     )
                 }
@@ -259,12 +261,12 @@ fun WardrobeListOfItemsFromCurrentCategory(
 @Composable
 fun SingleClothItem(
     item: Item,
-    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap,
+    getItemPhotoByPhotoFilename: (itemId: String) -> Bitmap?,
     setActiveInactive: (item: Item) -> Unit,
     deleteItem: (item: Item) -> Unit,
     editing: Boolean,
-    goToSingleItem: (itemId: Int) -> Unit
-
+    goToSingleItem: (itemId: Int) -> Unit,
+    modifier: Modifier
     ) {
 
 
@@ -303,7 +305,7 @@ fun SingleClothItem(
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .padding(0.dp,5.dp)
     ) {
 
@@ -318,7 +320,8 @@ fun SingleClothItem(
 
         ImageIcon(
             modifier = Modifier
-                .align(Alignment.TopEnd),
+                .align(Alignment.TopEnd)
+                .testTag("testItem"+item.id+"-delete"),
             tickOpacity = deleteOpacity,
             size = 30.dp,
             icon = R.drawable.close,
@@ -350,19 +353,19 @@ fun SingleClothItem(
 
 
                 ) {
-
-                Image(
-                    bitmap = getItemPhotoByPhotoFilename(item.photoFilename).asImageBitmap(),
-                    contentDescription = item.name,
-                    modifier = Modifier
-                        .size(120.dp)
-                        .alpha(itemOpacity)
-                )
-//                Text(
-//                    text = item.name, textAlign = TextAlign.Center, modifier = Modifier
-//                        .padding(5.dp, 0.dp, 5.dp, 10.dp)
-//
-//                )
+                val bm = getItemPhotoByPhotoFilename(item.photoFilename)?.asImageBitmap()
+                if (bm != null) {
+                    Image(
+                        bitmap = bm,
+                        contentDescription = item.name,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .alpha(itemOpacity)
+                    )
+                }
+                else {
+                    Text("Could not load the photo")
+                }
             }
         }
     }

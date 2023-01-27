@@ -320,7 +320,8 @@ fun SingleClothItem(
 
         ImageIcon(
             modifier = Modifier
-                .align(Alignment.TopEnd),
+                .align(Alignment.TopEnd)
+                .testTag("item-"+item.id+"-delete"),
             tickOpacity = deleteOpacity,
             size = 30.dp,
             icon = R.drawable.close,

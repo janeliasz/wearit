@@ -52,6 +52,8 @@ class WardrobeScreenTest{
         val testItemBitmap = BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().targetContext.resources, R.drawable.cargos);
         println("filename: "+internalStorageHelper.savePhoto(testItemBitmap, "cargos.png", InstrumentationRegistry.getInstrumentation().targetContext))
 
+        Awaitility.setDefaultPollInterval(500, TimeUnit.MILLISECONDS)
+
         hiltRule.inject()
         composeRule.setContent {
             val navController = rememberNavController()
@@ -105,23 +107,28 @@ class WardrobeScreenTest{
     }
 
 
-    @Test
-    fun dupa(){
-        Awaitility.setDefaultPollInterval(500, TimeUnit.MILLISECONDS)
+//    @Test
+//    fun dupa() {
+//        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+//            composeRule.onNodeWithTag("item-1").assertExists()
+//        }
+//    }
+//
+//    @Test
+//    fun dupa2() {
+//        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+//            composeRule.onNodeWithTag("item-1").assertExists()
+//        }
+//    }
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-            composeRule.onNodeWithTag("item-1").assertExists()
-        }
+    @Test
+    fun clickEdit_DeleteButtonVisible() {
+        composeRule.onNodeWithText("EDIT").performClick()
+
+        composeRule.onNodeWithTag("item-1-delete").assertExists()
     }
 
-    @Test
-    fun dupa2(){
-        Awaitility.setDefaultPollInterval(500, TimeUnit.MILLISECONDS)
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-            composeRule.onNodeWithTag("item-1").assertExists()
-        }
-    }
 
 
 }

@@ -180,6 +180,7 @@ fun PickerContent(
                                     color = MaterialTheme.colors.primary.copy(alpha = LocalContentAlpha.current),
                                     shape = RoundedCornerShape(50.dp)
                                 )
+                                .testTag("selectedItem")
                         ) {
                             val bitmap = getItemPhotoByPhotoFilename(item.photoFilename)
 

@@ -27,6 +27,7 @@ import com.example.wearit.model.Category
 import com.example.wearit.model.Item
 import kotlinx.coroutines.runBlocking
 import org.awaitility.Awaitility
+import org.junit.After
 import java.util.concurrent.TimeUnit
 
 
@@ -103,6 +104,15 @@ class WardrobeScreenTest{
         }
 
 
+    }
+
+    @After
+    fun end() {
+        viewModel.getAllOutfits.value.forEach {
+            viewModel.deleteOutfit(it)
+        }
+
+        viewModel.getAllItems.value.forEach { viewModel.deleteItem(it) }
     }
 
 

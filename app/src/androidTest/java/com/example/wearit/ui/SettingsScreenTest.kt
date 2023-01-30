@@ -2,7 +2,6 @@ package com.example.wearit.ui
 
 import SettingsScreen
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.*
@@ -13,7 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.wearit.MainActivity
 import com.example.wearit.WearItScreen
-import com.example.wearit.data.AppViewModel
+import com.example.wearit.model.AppViewModel
 import com.example.wearit.di.AppModule
 import com.example.wearit.ui.theme.WearItTheme
 import dagger.hilt.android.testing.HiltAndroidRule

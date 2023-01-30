@@ -1,5 +1,6 @@
 package com.example.wearit.data
 
+import com.example.wearit.model.AppViewModel
 import com.example.wearit.model.Category
 import org.junit.Before
 import org.junit.Test

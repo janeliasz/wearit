@@ -16,7 +16,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "com.example.wearit.HiltTestRunner"
+        testInstrumentationRunner = "com.example.wearit.runner.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary true
         }
@@ -105,4 +105,7 @@ dependencies {
 
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
     kapt "androidx.hilt:hilt-compiler:1.0.0"
+
+
+    implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
 }

@@ -1,4 +1,4 @@
-package com.example.wearit
+package com.example.wearit.runner
 
 import android.app.Application
 import android.content.Context

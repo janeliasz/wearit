@@ -38,7 +38,7 @@ fun WearItApp() {
 
     NavHost(
         navController = navController,
-        startDestination = WearItScreen.Intro.name
+        startDestination = WearItScreen.Picker.name
     ) {
         composable(WearItScreen.Intro.name) {
             IntroScreen(navigateToPicker = { navController.navigate(WearItScreen.Picker.name) })

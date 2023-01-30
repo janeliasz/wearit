@@ -2,10 +2,8 @@ package com.example.wearit.data
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wearit.di.AppUiState
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
 import com.example.wearit.model.Outfit
@@ -201,4 +199,5 @@ class AppViewModel @Inject constructor(
             storeSettings.saveIsAppInDarkTheme(darkMode)
         }
     }
+
 }

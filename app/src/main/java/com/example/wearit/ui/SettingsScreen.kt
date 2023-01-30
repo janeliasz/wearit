@@ -3,6 +3,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,7 +63,9 @@ fun SettingsContent(
                     checkedThumbColor = MaterialTheme.colors.primary,
                     uncheckedTrackColor = MaterialTheme.colors.surface,
                     uncheckedThumbColor = MaterialTheme.colors.primary,
-                )
+                ),
+                modifier = Modifier.testTag("darkModeSwitch")
+
             )
         }
 
@@ -130,7 +133,7 @@ fun SettingsBottomBar(
             color = MaterialTheme.colors.onBackground,
             thickness = 4.dp,
             modifier = Modifier
-                .padding(start = 10.dp, end = 10.dp, bottom = 20.dp)
+                .padding(start = 10.dp, end = 10.dp, bottom = 20.dp).testTag("divider")
         )
 
         MasterButton(

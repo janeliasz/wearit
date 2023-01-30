@@ -1,9 +1,6 @@
 package com.example.wearit.data
 
 import com.example.wearit.model.Category
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 

@@ -23,6 +23,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import com.example.wearit.R
+import com.example.wearit.model.Category
+import com.example.wearit.model.Item
+import kotlinx.coroutines.runBlocking
 import org.awaitility.Awaitility
 import java.util.concurrent.TimeUnit
 
@@ -39,6 +42,8 @@ class WardrobeScreenTest{
 
     private val internalStorageHelper = InternalStorageHelper(InstrumentationRegistry.getInstrumentation().targetContext)
 
+    private lateinit var viewModel: AppViewModel
+
     @SuppressLint("StateFlowValueCalledInComposition")
     @Before
     fun setUp(){
@@ -54,7 +59,13 @@ class WardrobeScreenTest{
         hiltRule.inject()
         composeRule.setContent {
             val navController = rememberNavController()
-            val viewModel =  hiltViewModel<AppViewModel>()
+            viewModel =  hiltViewModel<AppViewModel>()
+
+            runBlocking {
+                viewModel.getAppRepository().addItem(Item(1,"testItem1", "testItem1.png", Category.Headgear))
+                viewModel.getAppRepository().addItem(Item(2,"testItem2", "testItem2.png", Category.Headgear))
+                viewModel.getAppRepository().addItem(Item(3,"testItem3", "testItem3.png", Category.Coat))
+            }
 
             WearItTheme {
                 NavHost(

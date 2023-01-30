@@ -25,6 +25,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import com.example.wearit.R
+import com.example.wearit.model.Category
+import com.example.wearit.model.Item
+import kotlinx.coroutines.runBlocking
 import org.awaitility.Awaitility
 import org.junit.After
 import java.util.concurrent.TimeUnit
@@ -62,6 +65,12 @@ class PickerScreenTest{
             viewModel =  hiltViewModel<AppViewModel>()
             val uiState by viewModel.uiState.collectAsState()
 
+            runBlocking {
+                viewModel.getAppRepository().addItem(Item(1,"testItem1", "testItem1.png", Category.Headgear))
+                viewModel.getAppRepository().addItem(Item(2,"testItem2", "testItem2.png", Category.Headgear))
+                viewModel.getAppRepository().addItem(Item(3,"testItem3", "testItem3.png", Category.Coat))
+            }
+
 
             WearItTheme {
                 NavHost(
@@ -76,7 +85,7 @@ class PickerScreenTest{
                             getItemPhotoByPhotoFilename = { itemId ->
                                 viewModel.getItemPhotoByPhotoFilename(
                                     itemId
-                                )!!
+                                )
                             },
                             currentSelection = uiState.currentSelection.mapNotNull { itemId ->
                                 viewModel.getItemById(
@@ -107,10 +116,11 @@ class PickerScreenTest{
 
     @After
     fun end() {
-        val outfitsSavedDuringTests = viewModel.getAllOutfits.value
-        outfitsSavedDuringTests.forEach {
+        viewModel.getAllOutfits.value.forEach {
             viewModel.deleteOutfit(it)
         }
+
+        viewModel.getAllItems.value.forEach { viewModel.deleteItem(it) }
     }
 
 
@@ -119,6 +129,15 @@ class PickerScreenTest{
         composeRule.onNodeWithTag("drawButton").performClick()
 
         composeRule.onAllNodesWithTag("selectedItem").onFirst().assertExists()
+    }
+
+    @Test
+    fun clickDraw_noItems_noItemsDrawn() {
+        viewModel.getAllItems.value.forEach { viewModel.deleteItem(it) }
+
+        composeRule.onNodeWithTag("drawButton").performClick()
+
+        composeRule.onNodeWithText("You have to draw your items first").assertExists()
     }
 
     @Test

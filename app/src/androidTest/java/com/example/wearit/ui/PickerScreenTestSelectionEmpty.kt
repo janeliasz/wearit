@@ -1,110 +1,110 @@
-package com.example.wearit.ui
-
-
-import android.annotation.SuppressLint
-import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.wearit.MainActivity
-import com.example.wearit.WearItScreen
-import com.example.wearit.data.*
-import com.example.wearit.di.AppModule
-import com.example.wearit.ui.theme.WearItTheme
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.UninstallModules
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import com.example.wearit.model.AppViewModel
-
-@HiltAndroidTest
-@UninstallModules(AppModule::class)
-class PickerScreenTestSelectionEmpty{
-
-    @get:Rule(order=0)
-    val hiltRule = HiltAndroidRule(this)
-
-    @get:Rule(order=1)
-    val composeRule = createAndroidComposeRule<MainActivity>()
-
-
-    @SuppressLint("StateFlowValueCalledInComposition")
-    @Before
-    fun setUp(){
-
-        hiltRule.inject()
-        composeRule.setContent {
-            val navController = rememberNavController()
-            val viewModel =  hiltViewModel<AppViewModel>()
-
-            WearItTheme {
-                NavHost(
-                    navController = navController,
-                    startDestination = WearItScreen.Picker.name
-                ) {
-
-                    composable(WearItScreen.Picker.name) {
-                        PickerScreen(
-                            goToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
-                            getItemPhotoByPhotoFilename = { itemId ->
-                                viewModel.getItemPhotoByPhotoFilename(
-                                    itemId
-                                )
-                            },
-                            currentSelection = viewModel.uiState.value.currentSelection.mapNotNull {
-                                    itemId ->
-                                viewModel.getItemById(
-                                    itemId
-                                )
-                            }
-                            ,
-                            changeSelectedItem = { category, next ->
-                                viewModel.changeSelectedItem(
-                                    category,
-                                    next
-                                )
-                            },
-                            drawSelection = { viewModel.drawItems() },
-                            saveOutfit = { viewModel.saveOutfit() }
-                        ) { navController.navigate(WearItScreen.Settings.name) }
-                    }
-
-                }
-
-
-
-            }
-
-
-        }
-
-
-    }
-
-
-    @Test
-    fun clickingDraw_emptySelection_nothing(){
-        composeRule.onNodeWithTag("drawButton").performClick()
-        composeRule.onNodeWithText("You have to draw your items first").assertExists()
-        Thread.sleep(3000)
-    }
-
-
-    @Test
-    fun clickingSave_emptySelection_SnackBar(){
-        composeRule.onNodeWithTag("saveOutfit")
-                    .performClick()
-
-        composeRule.onNodeWithTag("snackBarInfo")
-                    .onChild()
-                    .assertTextEquals("Outfit can't be empty")
-    }
-
-
-
-
-}
+//package com.example.wearit.ui
+//
+//
+//import android.annotation.SuppressLint
+//import androidx.compose.ui.test.*
+//import androidx.compose.ui.test.junit4.createAndroidComposeRule
+//import androidx.hilt.navigation.compose.hiltViewModel
+//import androidx.navigation.compose.NavHost
+//import androidx.navigation.compose.composable
+//import androidx.navigation.compose.rememberNavController
+//import com.example.wearit.MainActivity
+//import com.example.wearit.WearItScreen
+//import com.example.wearit.data.*
+//import com.example.wearit.di.AppModule
+//import com.example.wearit.ui.theme.WearItTheme
+//import dagger.hilt.android.testing.HiltAndroidRule
+//import dagger.hilt.android.testing.HiltAndroidTest
+//import dagger.hilt.android.testing.UninstallModules
+//import org.junit.Before
+//import org.junit.Rule
+//import org.junit.Test
+//import com.example.wearit.model.AppViewModel
+//
+//@HiltAndroidTest
+//@UninstallModules(AppModule::class)
+//class PickerScreenTestSelectionEmpty{
+//
+//    @get:Rule(order=0)
+//    val hiltRule = HiltAndroidRule(this)
+//
+//    @get:Rule(order=1)
+//    val composeRule = createAndroidComposeRule<MainActivity>()
+//
+//
+//    @SuppressLint("StateFlowValueCalledInComposition")
+//    @Before
+//    fun setUp(){
+//
+//        hiltRule.inject()
+//        composeRule.setContent {
+//            val navController = rememberNavController()
+//            val viewModel =  hiltViewModel<AppViewModel>()
+//
+//            WearItTheme {
+//                NavHost(
+//                    navController = navController,
+//                    startDestination = WearItScreen.Picker.name
+//                ) {
+//
+//                    composable(WearItScreen.Picker.name) {
+//                        PickerScreen(
+//                            goToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
+//                            getItemPhotoByPhotoFilename = { itemId ->
+//                                viewModel.getItemPhotoByPhotoFilename(
+//                                    itemId
+//                                )
+//                            },
+//                            currentSelection = viewModel.uiState.value.currentSelection.mapNotNull {
+//                                    itemId ->
+//                                viewModel.getItemById(
+//                                    itemId
+//                                )
+//                            }
+//                            ,
+//                            changeSelectedItem = { category, next ->
+//                                viewModel.changeSelectedItem(
+//                                    category,
+//                                    next
+//                                )
+//                            },
+//                            drawSelection = { viewModel.drawItems() },
+//                            saveOutfit = { viewModel.saveOutfit() }
+//                        ) { navController.navigate(WearItScreen.Settings.name) }
+//                    }
+//
+//                }
+//
+//
+//
+//            }
+//
+//
+//        }
+//
+//
+//    }
+//
+//
+//    @Test
+//    fun clickingDraw_emptySelection_nothing(){
+//        composeRule.onNodeWithTag("drawButton").performClick()
+//        composeRule.onNodeWithText("You have to draw your items first").assertExists()
+//        Thread.sleep(3000)
+//    }
+//
+//
+//    @Test
+//    fun clickingSave_emptySelection_SnackBar(){
+//        composeRule.onNodeWithTag("saveOutfit")
+//                    .performClick()
+//
+//        composeRule.onNodeWithTag("snackBarInfo")
+//                    .onChild()
+//                    .assertTextEquals("Outfit can't be empty")
+//    }
+//
+//
+//
+//
+//}

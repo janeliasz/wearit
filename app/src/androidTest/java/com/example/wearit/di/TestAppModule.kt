@@ -19,11 +19,10 @@ object TestAppModule {
     @Provides
     fun provideAppDatabase(
         @ApplicationContext applicationContext: Context
-    ) = Room.databaseBuilder(
+    ) = Room.inMemoryDatabaseBuilder(
         applicationContext,
-        AppDatabase::class.java,
-        "WearIt_DB_test"
-    ).createFromAsset("database/item.db").build()
+        AppDatabase::class.java
+    ).build()
 
     @Singleton
     @Provides

@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -148,8 +149,7 @@ fun PickerContent(
                     .padding(top = 10.dp, bottom = 80.dp).testTag("items"),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(currentSelection) { item ->
-
+                itemsIndexed(currentSelection) { index, item ->
                     Row(
                         modifier = Modifier
                             .padding(10.dp)
@@ -180,7 +180,7 @@ fun PickerContent(
                                     color = MaterialTheme.colors.primary.copy(alpha = LocalContentAlpha.current),
                                     shape = RoundedCornerShape(50.dp)
                                 )
-                                .testTag("selectedItem")
+                                .testTag("selectedItem-"+item.id)
                         ) {
                             val bitmap = getItemPhotoByPhotoFilename(item.photoFilename)
 
@@ -201,7 +201,8 @@ fun PickerContent(
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
                                 .padding(10.dp)
-                                .weight(0.2f, fill = true),
+                                .weight(0.2f, fill = true)
+                                .testTag("arrowRight-$index"),
                             onClick= { changeSelectedItem(item.category, false) }
 
                         )

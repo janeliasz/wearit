@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -98,14 +99,17 @@ fun FavoritesContent(
             contentPadding = PaddingValues(horizontal = 35.dp, vertical = 50.dp),
             verticalArrangement = Arrangement.spacedBy(50.dp),
         ) {
-            items(outfits) { outfit ->
-                SingleOutfit(
-                    outfit = outfit,
-                    getItemById = getItemById,
-                    getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
-                    editing = editing,
-                    deleteOutfit = deleteOutfit
-                )
+            itemsIndexed(outfits) { index, outfit ->
+                println("asd:"+index)
+                Box(modifier = Modifier.testTag("outfit$index")) {
+                    SingleOutfit(
+                        outfit = outfit,
+                        getItemById = getItemById,
+                        getItemPhotoByPhotoFilename = getItemPhotoByPhotoFilename,
+                        editing = editing,
+                        deleteOutfit = deleteOutfit
+                    )
+                }
             }
         }
 
@@ -145,7 +149,8 @@ fun SingleOutfit(
         if(editing){
             ImageIcon(
                 modifier = Modifier
-                    .align(Alignment.TopEnd).padding(top=5.dp),
+                    .align(Alignment.TopEnd)
+                    .padding(top = 5.dp),
                 tickOpacity = 1f,
                 size = 35.dp,
                 icon = R.drawable.close,

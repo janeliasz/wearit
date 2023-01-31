@@ -193,7 +193,8 @@ fun WardrobeListOfCategories(
                             width = 9.dp,
                             color = MaterialTheme.colors.primary,
                             shape = RoundedCornerShape(0.dp, 50.dp, 50.dp, 0.dp)
-                        ),
+                        )
+                        .testTag(category.name),
 
                     onClick = { onCategoryChange(category) }
                 ) {

@@ -1,8 +1,10 @@
-package com.example.wearit.ui
+package com.example.wearit.ui.e2e
 
 
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -25,6 +27,9 @@ import org.junit.Test
 import com.example.wearit.R
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
+import com.example.wearit.ui.FavoritesScreen
+import com.example.wearit.ui.PickerScreen
+import com.example.wearit.ui.WardrobeScreen
 import kotlinx.coroutines.runBlocking
 import org.awaitility.Awaitility
 import org.junit.After
@@ -33,7 +38,7 @@ import java.util.concurrent.TimeUnit
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
-class WardrobeScreenTest{
+class RemoveAndDrawE2E{
 
     @get:Rule(order=0)
     val hiltRule = HiltAndroidRule(this)
@@ -61,19 +66,49 @@ class WardrobeScreenTest{
         composeRule.setContent {
             val navController = rememberNavController()
             viewModel =  hiltViewModel<AppViewModel>()
+            val uiState by viewModel.uiState.collectAsState()
+            val outfits by viewModel.getAllOutfits.collectAsState()
 
+            println("przed runblocking")
             runBlocking {
-                viewModel.getAppRepository().addItem(Item(1,"testItem1", "testItem1.png", Category.Headgear))
+                println("im here")
+                viewModel.getAppRepository().addItem(Item(1,"testItem1", "testItem1.png", Category.Headgear, isActive = false))
                 viewModel.getAppRepository().addItem(Item(2,"testItem2", "testItem2.png", Category.Headgear))
                 viewModel.getAppRepository().addItem(Item(3,"testItem3", "testItem3.png", Category.Coat))
             }
 
+
             WearItTheme {
                 NavHost(
                     navController = navController,
-                    startDestination = WearItScreen.Wardrobe.name
+                    startDestination = WearItScreen.Picker.name
                 ) {
 
+
+                    composable(WearItScreen.Picker.name) {
+                        PickerScreen(
+                            goToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
+                            getItemPhotoByPhotoFilename = { itemId ->
+                                viewModel.getItemPhotoByPhotoFilename(
+                                    itemId
+                                )
+                            },
+                            currentSelection = uiState.currentSelection.mapNotNull { itemId ->
+                                viewModel.getItemById(
+                                    itemId
+                                )
+                            },
+                            changeSelectedItem = { category, next ->
+                                viewModel.changeSelectedItem(
+                                    category,
+                                    next
+                                )
+                            },
+                            drawSelection = { viewModel.drawItems() },
+                            saveOutfit = { viewModel.saveOutfit() },
+                            goToSettings = { navController.navigate(WearItScreen.Settings.name) }
+                        )
+                    }
 
                     composable(WearItScreen.Wardrobe.name) {
                         WardrobeScreen(
@@ -94,6 +129,21 @@ class WardrobeScreenTest{
                         )
                     }
 
+                    composable(WearItScreen.Favorites.name) {
+                        FavoritesScreen(
+                            goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
+                            goToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
+                            outfits = outfits,
+                            getItemById = { viewModel.getItemById(it) },
+                            deleteOutfit={ viewModel.deleteOutfit(it) },
+                            getItemPhotoByPhotoFilename = { itemId ->
+                                viewModel.getItemPhotoByPhotoFilename(
+                                    itemId
+                                )!!
+                            }
+                        )
+                    }
+
                 }
 
 
@@ -102,12 +152,12 @@ class WardrobeScreenTest{
 
 
         }
-
-
     }
 
     @After
     fun end() {
+        println("after")
+
         viewModel.getAllOutfits.value.forEach {
             viewModel.deleteOutfit(it)
         }
@@ -115,22 +165,40 @@ class WardrobeScreenTest{
         viewModel.getAllItems.value.forEach { viewModel.deleteItem(it) }
     }
 
-
     @Test
-    fun itemRenders() {
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-            composeRule.onNodeWithTag("testItem1").assertExists()
-        }
-    }
+    fun removeAndDraw() {
+        composeRule.onNodeWithText("WARDROBE").performClick()
 
-    @Test
-    fun clickEdit_deleteButtonVisible() {
         composeRule.onNodeWithText("EDIT").performClick()
 
-        composeRule.onNodeWithTag("testItem1-delete").assertExists()
+        composeRule.onNodeWithTag("testItem1-delete").performClick()
+
+        composeRule.onNodeWithText("DELETE").performClick()
+
+        composeRule.onNodeWithTag("testItem2-delete").performClick()
+
+        composeRule.onNodeWithText("DELETE").performClick()
+
+        composeRule.onNodeWithTag("Coat").performClick()
+
+        composeRule.onNodeWithText("DRAW").performClick()
+
+        composeRule.onNodeWithTag("drawButton").performClick()
+
+        composeRule.onNodeWithTag("selectedItem-1").assertDoesNotExist()
+
+        composeRule.onNodeWithTag("selectedItem-2").assertDoesNotExist()
+
+        composeRule.onNodeWithTag("selectedItem-3").assertExists()
+
+        composeRule.onNodeWithText("WARDROBE").performClick()
+
+        composeRule.onNodeWithTag("testItem3").performClick()
+
+        composeRule.onNodeWithText("DRAW").performClick()
+
+        composeRule.onNodeWithTag("drawButton").performClick()
+
     }
-
-
-
 
 }

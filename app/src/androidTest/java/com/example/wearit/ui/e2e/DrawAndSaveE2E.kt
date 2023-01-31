@@ -1,4 +1,4 @@
-package com.example.wearit.ui
+package com.example.wearit.ui.e2e
 
 
 import android.annotation.SuppressLint
@@ -27,6 +27,9 @@ import org.junit.Test
 import com.example.wearit.R
 import com.example.wearit.model.Category
 import com.example.wearit.model.Item
+import com.example.wearit.ui.FavoritesScreen
+import com.example.wearit.ui.PickerScreen
+import com.example.wearit.ui.WardrobeScreen
 import kotlinx.coroutines.runBlocking
 import org.awaitility.Awaitility
 import org.junit.After
@@ -35,7 +38,7 @@ import java.util.concurrent.TimeUnit
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
-class PickerScreenTest{
+class DrawAndSaveE2E{
 
     @get:Rule(order=0)
     val hiltRule = HiltAndroidRule(this)
@@ -64,9 +67,12 @@ class PickerScreenTest{
             val navController = rememberNavController()
             viewModel =  hiltViewModel<AppViewModel>()
             val uiState by viewModel.uiState.collectAsState()
+            val outfits by viewModel.getAllOutfits.collectAsState()
 
+            println("przed runblocking")
             runBlocking {
-                viewModel.getAppRepository().addItem(Item(1,"testItem1", "testItem1.png", Category.Headgear))
+                println("im here")
+                viewModel.getAppRepository().addItem(Item(1,"testItem1", "testItem1.png", Category.Headgear, isActive = false))
                 viewModel.getAppRepository().addItem(Item(2,"testItem2", "testItem2.png", Category.Headgear))
                 viewModel.getAppRepository().addItem(Item(3,"testItem3", "testItem3.png", Category.Coat))
             }
@@ -104,6 +110,40 @@ class PickerScreenTest{
                         )
                     }
 
+                    composable(WearItScreen.Wardrobe.name) {
+                        WardrobeScreen(
+                            onCategoryChange = { viewModel.goToCategory(it) },
+                            goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
+                            itemsOfCurrentCategory = viewModel.getAllItems.value.filter { item -> item.category == viewModel.uiState.value.currentCategory },
+                            saveItem = { bitmap -> viewModel.saveItem("test", bitmap) },
+                            getItemPhotoByPhotoFilename = { itemId ->
+                                viewModel.getItemPhotoByPhotoFilename(
+                                    itemId
+                                )
+                            },
+                            setActiveInactive = { viewModel.setItemActiveInactive(it) },
+                            currentCategory = viewModel.uiState.value.currentCategory,
+                            goToSingleItem = { itemId -> navController.navigate(WearItScreen.ItemInfo.name+"/${itemId}")},
+                            goToFavorites = { navController.navigate(WearItScreen.Favorites.name)},
+                            deleteItem = { viewModel.deleteItem(it) }
+                        )
+                    }
+
+                    composable(WearItScreen.Favorites.name) {
+                        FavoritesScreen(
+                            goToPickerScreen = { navController.navigate(WearItScreen.Picker.name) },
+                            goToWardrobe = { navController.navigate(WearItScreen.Wardrobe.name) },
+                            outfits = outfits,
+                            getItemById = { viewModel.getItemById(it) },
+                            deleteOutfit={ viewModel.deleteOutfit(it) },
+                            getItemPhotoByPhotoFilename = { itemId ->
+                                viewModel.getItemPhotoByPhotoFilename(
+                                    itemId
+                                )!!
+                            }
+                        )
+                    }
+
                 }
 
 
@@ -116,6 +156,8 @@ class PickerScreenTest{
 
     @After
     fun end() {
+        println("after")
+
         viewModel.getAllOutfits.value.forEach {
             viewModel.deleteOutfit(it)
         }
@@ -123,29 +165,21 @@ class PickerScreenTest{
         viewModel.getAllItems.value.forEach { viewModel.deleteItem(it) }
     }
 
-
     @Test
-    fun clickDraw_selectionDrawn() {
+    fun drawAndSaveOutfit() {
         composeRule.onNodeWithTag("drawButton").performClick()
 
-        composeRule.onAllNodesWithTag("selectedItem").onFirst().assertExists()
-    }
+        composeRule.onNodeWithTag("selectedItem-3").assertExists()
 
-    @Test
-    fun clickDraw_noItems_noItemsDrawn() {
-        viewModel.getAllItems.value.forEach { viewModel.deleteItem(it) }
+        composeRule.onNodeWithText("WARDROBE").performClick()
 
-        composeRule.onNodeWithTag("drawButton").performClick()
+        composeRule.onNodeWithTag("testItem1").performClick()
 
-        composeRule.onNodeWithText("You have to draw your items first").assertExists()
-    }
+        composeRule.onNodeWithText("DRAW").performClick()
 
-    @Test
-    fun clickingSave_Selection_SnackBar() {
-        composeRule.onNodeWithTag("drawButton").performClick()
+        composeRule.onNodeWithTag("arrowRight-0").performClick()
 
-        composeRule.onNodeWithTag("saveOutfit")
-            .performClick()
+        composeRule.onNodeWithTag("saveOutfit").performClick()
 
         composeRule.onNodeWithTag("snackBarInfo")
             .onChild()

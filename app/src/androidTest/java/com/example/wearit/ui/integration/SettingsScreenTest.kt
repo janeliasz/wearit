@@ -1,4 +1,4 @@
-package com.example.wearit.ui
+package com.example.wearit.ui.integration
 
 import SettingsScreen
 import android.annotation.SuppressLint
@@ -73,7 +73,6 @@ class SettingsScreenTest {
     fun clickingDarkMode_DarkModeON() {
         composeRule.onNodeWithTag("darkModeSwitch").assertIsToggleable()
         composeRule.onNodeWithTag("darkModeSwitch").performGesture {  swipeRight() }
-        Thread.sleep(3000)
     }
 
 
